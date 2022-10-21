@@ -17,6 +17,10 @@ func main() {
 	// 1859120
 	// 585190
 
+	// Add these:
+	// game[gameId].Data.Genres
+	// game[gameId].Data.Categories
+
 	reader := bufio.NewReader(os.Stdin)
 
 	var gameId string
@@ -317,8 +321,14 @@ func main() {
 
 		fmt.Println("* [18/24] Processing Input!")
 
-		outputFile.WriteString(`\n\n==Input==
-{{Input
+		outputFile.WriteString("\n\n==Input=={{Input\n")
+
+		controller := false
+		if game[gameId].Data.ControllerSupport != nil {
+			controller = true
+		}
+
+		outputFile.WriteString(`
 |key remap                 = unknown
 |key remap notes           = 
 |acceleration option       = unknown
@@ -330,11 +340,15 @@ func main() {
 |invert mouse y-axis       = unknown
 |invert mouse y-axis notes = 
 |touchscreen               = unknown
-|touchscreen notes         = 
-|controller support        = unknown
-|controller support notes  = 
-|full controller           = unknown
-|full controller notes     = 
+|touchscreen notes         = `)
+
+		outputFile.WriteString(fmt.Sprintf("\n|controller support        = %v\n|controller support notes  = \n|full controller           = ", controller))
+		if controller && *game[gameId].Data.ControllerSupport == "full" {
+			outputFile.WriteString("true")
+		}
+		outputFile.WriteString("\n|full controller notes     = ")
+
+		outputFile.WriteString(`
 |controller remap          = unknown
 |controller remap notes    = 
 |controller sensitivity    = unknown
@@ -412,15 +426,8 @@ func main() {
 
 		for k, v := range languages {
 			outputFile.WriteString(
-				fmt.Sprintf(`{{L10n/switch
-				|language  = %s
-				|interface = %v
-				|audio     = %v
-				|subtitles = %v
-				|notes     = 
-				|fan       = 
-				|ref       = 
-				}}`, k, v.UI, v.Audio, v.Subtitles))
+				fmt.Sprintf("{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = }}",
+					k, v.UI, v.Audio, v.Subtitles))
 		}
 
 		outputFile.WriteString(`}}\n\n`)

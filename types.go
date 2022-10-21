@@ -15,7 +15,7 @@ type Data struct {
 	SteamAppid          int64              `json:"steam_appid"`
 	RequiredAge         int64              `json:"required_age"`
 	IsFree              bool               `json:"is_free"`
-	ControllerSupport   string             `json:"controller_support"`
+	ControllerSupport   *string            `json:"controller_support,omitempty"`
 	Dlc                 []int64            `json:"dlc,omitempty"`
 	DetailedDescription string             `json:"detailed_description"`
 	AboutTheGame        string             `json:"about_the_game"`

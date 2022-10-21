@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.6
+v0.0.61
 
 ## Todo
 
@@ -66,7 +66,10 @@ v0.0.6
 - [ ] Save Game Data: File location
 - [ ] Save Game Sync
 - [ ] Video
-- [ ] Input
+- [ ] Input: Key remapping
+- [ ] Input: Touchscreen
+- [x] Input: Controller Support, Full Controller
+- [ ] Input: Controller (PS/Xbox/Others)
 - [ ] Audio
 - [x] Languages (There maybe some discrepancies as Steam API provides very vague info)
 - [ ] API

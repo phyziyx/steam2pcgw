@@ -69,7 +69,7 @@ func ProcessLanguages(input string) Language {
 
 	for i := 0; i < len(input); i++ {
 
-		fmt.Printf("[ProcessLanguages] '%c' char found (language: '%s')\n", input[i], language)
+		// fmt.Printf("[ProcessLanguages] '%c' char found (language: '%s')\n", input[i], language)
 
 		if rune(input[i]) == '\n' {
 			// New line, new language!
@@ -80,7 +80,7 @@ func ProcessLanguages(input string) Language {
 					Audio:     false,
 					Subtitles: true,
 				}
-				fmt.Printf("[ProcessLanguages] %s added (\\n found)\n", language)
+				// fmt.Printf("[ProcessLanguages] %s added (\\n found)\n", language)
 			}
 
 			language = ""
@@ -94,7 +94,7 @@ func ProcessLanguages(input string) Language {
 				Audio:     true,
 				Subtitles: true,
 			}
-			fmt.Printf("[ProcessLanguages] %s added (* found)\n", language)
+			// fmt.Printf("[ProcessLanguages] %s added (* found)\n", language)
 
 			language = ""
 			continue
