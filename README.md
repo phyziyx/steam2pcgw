@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.5
+v0.0.6
 
 ## Todo
 
@@ -68,7 +68,7 @@ v0.0.5
 - [ ] Video
 - [ ] Input
 - [ ] Audio
-- [ ] Languages
+- [x] Languages (There maybe some discrepancies as Steam API provides very vague info)
 - [ ] API
 - [ ] Middleware
 - [x] System Requirements: Windows

@@ -1,18 +1,8 @@
 package main
 
-import "encoding/json"
+// JSON related
 
 type Game map[string]GameValue
-
-func UnmarshalGame(data []byte) (Game, error) {
-	var r Game
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *Game) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
 
 type GameValue struct {
 	Success bool `json:"success"`
@@ -161,4 +151,14 @@ type Screenshot struct {
 type SupportInfo struct {
 	URL   string `json:"url"`
 	Email string `json:"email"`
+}
+
+// Language
+
+type Language map[string]LanguageValue
+
+type LanguageValue struct {
+	UI        bool
+	Audio     bool
+	Subtitles bool
 }

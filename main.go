@@ -6,50 +6,8 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 )
-
-func processSpecs(input string, isMin bool) string {
-	// Create vars
-	var level string
-	output := input
-
-	if len(output) == 0 {
-		return output
-	}
-
-	// Sanitise input and remove HTML tags
-	noTag, _ := regexp.Compile(`(<[^>]*>)+`)
-	output = noTag.ReplaceAllLiteralString(output, "\n")
-
-	// Cleanup some text, more texts must be added here...
-	output = strings.Replace(output, "Requires a 64-bit processor and operating system", "", 1)
-
-	// Determine
-	if isMin {
-		level = "min"
-		output = strings.Replace(output, "Minimum:", "", 1)
-	} else {
-		level = "rec"
-		output = strings.Replace(output, "Recommended:", "", 1)
-	}
-
-	// Replace
-	output = strings.Replace(output, "OS:\n", fmt.Sprintf("|%sOS    = ", level), 1)
-
-	output = strings.Replace(output, "Processor:\n", fmt.Sprintf("|%sCPU    = |%sCPU2    = ", level, level), 1)
-
-	output = strings.Replace(output, "Storage:\n", fmt.Sprintf("|%sHD    = ", level), 1)
-
-	output = strings.Replace(output, "Graphics:\n", fmt.Sprintf("|%sGPU    = |%sGPU2    = ", level, level), 1)
-	output = strings.Replace(output, "Memory:\n", fmt.Sprintf("|%sRAM   = ", level), 1)
-	output = strings.Replace(output, "OS:\n", fmt.Sprintf("|%sVRAM    = ", level), 1)
-	output = strings.Replace(output, "DirectX:\n", fmt.Sprintf("|%sDX    = ", level), 1)
-
-	// Output
-	return output
-}
 
 func main() {
 
@@ -57,6 +15,7 @@ func main() {
 	// 2065780
 	// 2139510
 	// 1859120
+	// 585190
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -260,42 +219,37 @@ func main() {
 
 		fmt.Println("* [12/24] Processing Microtransactions!")
 
-		outputFile.WriteString(`\n\n===Microtransactions===
-{{Microtransactions
-|boost               = 
-|cosmetic            = 
-|currency            = 
-|finite spend        = 
-|infinite spend      = 
-|free-to-grind       = 
-|loot box            = 
-|none                = None
-|player trading      = 
-|time-limited        = 
-|unlock              = 
-}}`)
+		outputFile.WriteString("\n\n===Microtransactions===\n{{Microtransactions")
+
+		outputFile.WriteString("\n|boost               = ")
+		outputFile.WriteString("\n|cosmetic            = ")
+		outputFile.WriteString("\n|currency            = ")
+		outputFile.WriteString("\n|finite spend        = ")
+		outputFile.WriteString("\n|infinite spend      = ")
+		outputFile.WriteString("\n|free-to-grind       = ")
+		outputFile.WriteString("\n|loot box            = ")
+		outputFile.WriteString("\n|none                = None")
+		outputFile.WriteString("\n|player trading      = ")
+		outputFile.WriteString("\n|time-limited        = ")
+		outputFile.WriteString("\n|unlock              = ")
+		outputFile.WriteString("\n}}")
 
 		fmt.Println("* [13/24] Processing DLCs!")
-
-		outputFile.WriteString(`\n\n{{DLC|
-<!-- DLC rows goes below: -->
-
-}}`)
+		outputFile.WriteString("\n\n{{DLC|\n<!-- DLC rows goes below: -->\n}}")
 
 		fmt.Println("* [14/24] Processing Config File Location!")
 
-		outputFile.WriteString(`\n\n==Game data==
-===Configuration file(s) location===
-{{Game data|
-{{Game data/config|Windows|}}
-}}`)
+		outputFile.WriteString("\n\n==Game data==\n===Configuration file(s) location===")
+		outputFile.WriteString("\n{{Game data|")
+		outputFile.WriteString("\n{{Game data/config|Windows|}}")
+		outputFile.WriteString("\n}}")
 
 		fmt.Println("* [15/24] Processing Save Game Location!")
 
-		outputFile.WriteString(`\n\n===Save game data location===
-{{Game data|
-{{Game data/saves|Windows|}}
-}}`)
+		outputFile.WriteString("\n\n===Save game data location===")
+		outputFile.WriteString("\n{{Game data|")
+		outputFile.WriteString("\n{{Game data/saves|Windows|}}")
+		outputFile.WriteString("\n}}")
 
 		fmt.Println("* [16/24] Processing Save Game Sync!")
 
@@ -451,21 +405,23 @@ func main() {
 |general midi audio notes  = 
 }}`)
 
-		// TODO:
 		fmt.Println("* [20/24] Processing Languages!")
-		// game[gameId].Data.SupportedLanguages
+		languages := ProcessLanguages(game[gameId].Data.SupportedLanguages)
 
 		outputFile.WriteString(`{{L10n|content=`)
 
-		outputFile.WriteString(`{{L10n/switch
-|language  = English
-|interface = true
-|audio     = unknown
-|subtitles = unknown
-|notes     = 
-|fan       = 
-|ref       = 
-}}`)
+		for k, v := range languages {
+			outputFile.WriteString(
+				fmt.Sprintf(`{{L10n/switch
+				|language  = %s
+				|interface = %v
+				|audio     = %v
+				|subtitles = %v
+				|notes     = 
+				|fan       = 
+				|ref       = 
+				}}`, k, v.UI, v.Audio, v.Subtitles))
+		}
 
 		outputFile.WriteString(`}}\n\n`)
 
@@ -535,12 +491,12 @@ func main() {
 		fmt.Println("* [23/24] Processing System Requirements!")
 		outputFile.WriteString("\n\n==System requirements=={{System requirements\n\n|OSfamily = Windows\n")
 
-		specs := processSpecs(game[gameId].Data.PCRequirements.Minimum, true)
+		specs := ProcessSpecs(game[gameId].Data.PCRequirements.Minimum, true)
 		outputFile.WriteString(specs)
 
 		// Handle recommended specs
 		if game[gameId].Data.PCRequirements.Recommended != nil {
-			specs = processSpecs(*game[gameId].Data.PCRequirements.Recommended, false)
+			specs = ProcessSpecs(*game[gameId].Data.PCRequirements.Recommended, false)
 			outputFile.WriteString(specs)
 		} else {
 			outputFile.WriteString("\n|recOS    = ")
