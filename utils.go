@@ -54,7 +54,79 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.Replace(output, "OS:\n", fmt.Sprintf("|%sVRAM    = ", level), 1)
 	output = strings.Replace(output, "DirectX:\n", fmt.Sprintf("|%sDX    = ", level), 1)
 
+	output = strings.Replace(output, "Additional Notes:\n", "\n|notes    = ", 1)
+
 	// Output
+	return output
+}
+
+func emptySpecs(level string) string {
+	return fmt.Sprintf(`|%sOS    = 
+|%sCPU   = 
+|%sCPU2  = 
+|%sRAM   = 
+|%sHD    = 
+|%sGPU   = 
+|%sGPU2  = 
+|%sVRAM  = 
+`, level, level, level, level, level, level, level, level)
+}
+
+func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequirements Requirements) string {
+	var output string = ""
+	var specs string = ""
+
+	if platforms.Windows {
+		output += "|OSfamily = Windows"
+		specs = ProcessSpecs(pcRequirements.Minimum, true)
+		output += (specs)
+
+		// Handle recommended specs
+		if pcRequirements.Recommended != nil {
+			specs = ProcessSpecs(*pcRequirements.Recommended, false)
+			output += (specs)
+		} else {
+			emptySpecs("rec")
+		}
+
+		// Output closure
+		output += ("\n}}")
+	}
+
+	if platforms.MAC {
+		output += ("|OSfamily = Mac")
+		specs = ProcessSpecs(macRequirements.Minimum, true)
+		output += (specs)
+
+		// Handle recommended specs
+		if macRequirements.Recommended != nil {
+			specs = ProcessSpecs(*macRequirements.Recommended, false)
+			output += (specs)
+		} else {
+			emptySpecs("rec")
+		}
+
+		// Output closure
+		output += ("\n}}")
+	}
+
+	if platforms.Linux {
+		output += ("|OSfamily = Linux")
+		specs = ProcessSpecs(linuxRequirements.Minimum, true)
+		output += (specs)
+
+		// Handle recommended specs
+		if linuxRequirements.Recommended != nil {
+			specs = ProcessSpecs(*linuxRequirements.Recommended, false)
+			output += (specs)
+		} else {
+			emptySpecs("rec")
+		}
+
+		// Output closure
+		output += ("\n}}")
+	}
+
 	return output
 }
 

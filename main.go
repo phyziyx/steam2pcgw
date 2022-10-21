@@ -496,31 +496,9 @@ func main() {
 }}`)
 
 		fmt.Println("* [23/24] Processing System Requirements!")
-		outputFile.WriteString("\n\n==System requirements=={{System requirements\n\n|OSfamily = Windows\n")
+		outputFile.WriteString("\n\n==System requirements=={{System requirements\n\n")
 
-		specs := ProcessSpecs(game[gameId].Data.PCRequirements.Minimum, true)
-		outputFile.WriteString(specs)
-
-		// Handle recommended specs
-		if game[gameId].Data.PCRequirements.Recommended != nil {
-			specs = ProcessSpecs(*game[gameId].Data.PCRequirements.Recommended, false)
-			outputFile.WriteString(specs)
-		} else {
-			outputFile.WriteString("\n|recOS    = ")
-			outputFile.WriteString("\n|recCPU   = ")
-			outputFile.WriteString("\n|recCPU2  = ")
-			outputFile.WriteString("\n|recRAM   = ")
-			outputFile.WriteString("\n|recHD    = ")
-			outputFile.WriteString("\n|recGPU   = ")
-			outputFile.WriteString("\n|recGPU2  = ")
-			outputFile.WriteString("\n|recVRAM  = ")
-		}
-
-		// Output closure
-		outputFile.WriteString("\n|notes    = ")
-		outputFile.WriteString("\n}}")
-
-		// TODO: Handle Mac and Linux requirements if Mac and Linux bools are true
+		outputFile.WriteString(OutputSpecs(game[gameId].Data.Platforms, game[gameId].Data.PCRequirements, game[gameId].Data.MACRequirements, game[gameId].Data.LinuxRequirements))
 
 		fmt.Println("* [24/24] Processing References!")
 		outputFile.WriteString("\n\n{{References}}")
