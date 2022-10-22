@@ -499,6 +499,8 @@ func main() {
 		outputFile.WriteString("\n\n==System requirements=={{System requirements\n\n")
 
 		outputFile.WriteString(OutputSpecs(game[gameId].Data.Platforms, game[gameId].Data.PCRequirements, game[gameId].Data.MACRequirements, game[gameId].Data.LinuxRequirements))
+		// Output closure
+		outputFile.WriteString("\n}}")
 
 		fmt.Println("* [24/24] Processing References!")
 		outputFile.WriteString("\n\n{{References}}")

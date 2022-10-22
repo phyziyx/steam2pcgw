@@ -100,9 +100,6 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		} else {
 			emptySpecs("rec")
 		}
-
-		// Output closure
-		output += ("\n}}")
 	}
 
 	if platforms.MAC {
@@ -117,9 +114,6 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		} else {
 			emptySpecs("rec")
 		}
-
-		// Output closure
-		output += ("\n}}")
 	}
 
 	if platforms.Linux {
@@ -134,9 +128,6 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		} else {
 			emptySpecs("rec")
 		}
-
-		// Output closure
-		output += ("\n}}")
 	}
 
 	return output
