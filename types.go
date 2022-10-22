@@ -23,19 +23,19 @@ type Data struct {
 	SupportedLanguages  string             `json:"supported_languages"`
 	HeaderImage         string             `json:"header_image"`
 	Website             *string            `json:"website"`
-	PCRequirements      Requirements       `json:"pc_requirements"`
-	MACRequirements     Requirements       `json:"mac_requirements"`
-	LinuxRequirements   Requirements       `json:"linux_requirements"`
+	PCRequirements      Requirement        `json:"pc_requirements"`
+	MACRequirements     Requirement        `json:"mac_requirements"`
+	LinuxRequirements   Requirement        `json:"linux_requirements"`
 	Developers          []string           `json:"developers"`
 	Publishers          []string           `json:"publishers"`
 	Packages            []int64            `json:"packages"`
-	PackageGroups       []PackageGroup     `json:"package_groups"`
+	PackageGroups       *[]PackageGroup    `json:"package_groups,omitempty"`
 	Platforms           Platforms          `json:"platforms"`
 	Metacritic          *Metacritic        `json:"metacritic,omitempty"`
 	Categories          []Category         `json:"categories"`
 	Genres              []Genre            `json:"genres"`
 	Screenshots         []Screenshot       `json:"screenshots"`
-	Movies              []Movie            `json:"movies"`
+	Movies              []Movie            `json:"movies,omitempty"`
 	Recommendations     Recommendations    `json:"recommendations"`
 	Achievements        Achievements       `json:"achievements"`
 	ReleaseDate         ReleaseDate        `json:"release_date"`
@@ -72,10 +72,7 @@ type Genre struct {
 	Description string `json:"description"`
 }
 
-type Requirements struct {
-	Minimum     string  `json:"minimum"`
-	Recommended *string `json:"recommended,omitempty"`
-}
+type Requirement map[string]interface{}
 
 type Metacritic struct {
 	Score int64  `json:"score"`

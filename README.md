@@ -74,7 +74,7 @@ v0.0.61
 - [x] Languages (There maybe some discrepancies as Steam API provides very vague info)
 - [ ] API
 - [ ] Middleware
-- [x] System Requirements: Windows
-- [ ] System Requirements: Mac
-- [ ] System Requirements: Linux
+- [x] System Requirements: Windows (Needs manual review)
+- [x] System Requirements: Mac (Needs manual review)
+- [x] System Requirements: Linux (Needs manual review)
 - [x] References

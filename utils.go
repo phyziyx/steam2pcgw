@@ -17,6 +17,17 @@ func (r *Game) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
+func OutputGenres(genres []Genre) string {
+	var output = ""
+
+	for _, v := range genres {
+		output += v.Description + ", "
+	}
+	output = strings.TrimSuffix(output, ", ")
+
+	return output
+}
+
 func ProcessSpecs(input string, isMin bool) string {
 	// Create vars
 	var level string
@@ -29,6 +40,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	// Sanitise input and remove HTML tags
 	noTag, _ := regexp.Compile(`(<[^>]*>)+`)
 	output = noTag.ReplaceAllLiteralString(output, "\n")
+	output = strings.ReplaceAll(output, "\n ", "")
 
 	// Cleanup some text, more texts must be added here...
 	output = strings.Replace(output, "Requires a 64-bit processor and operating system", "", 1)
@@ -43,18 +55,18 @@ func ProcessSpecs(input string, isMin bool) string {
 	}
 
 	// Replace
-	output = strings.Replace(output, "OS:\n", fmt.Sprintf("|%sOS    = ", level), 1)
+	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sOS    = ", level), 1)
 
-	output = strings.Replace(output, "Processor:\n", fmt.Sprintf("|%sCPU    = |%sCPU2    = ", level, level), 1)
+	output = strings.Replace(output, "Processor:", fmt.Sprintf("|%sCPU    = |%sCPU2    = ", level, level), 1)
 
-	output = strings.Replace(output, "Storage:\n", fmt.Sprintf("|%sHD    = ", level), 1)
+	output = strings.Replace(output, "Storage:", fmt.Sprintf("|%sHD    = ", level), 1)
 
-	output = strings.Replace(output, "Graphics:\n", fmt.Sprintf("|%sGPU    = |%sGPU2    = ", level, level), 1)
-	output = strings.Replace(output, "Memory:\n", fmt.Sprintf("|%sRAM   = ", level), 1)
-	output = strings.Replace(output, "OS:\n", fmt.Sprintf("|%sVRAM    = ", level), 1)
-	output = strings.Replace(output, "DirectX:\n", fmt.Sprintf("|%sDX    = ", level), 1)
+	output = strings.Replace(output, "Graphics:", fmt.Sprintf("|%sGPU    = |%sGPU2    = ", level, level), 1)
+	output = strings.Replace(output, "Memory:", fmt.Sprintf("|%sRAM   = ", level), 1)
+	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sVRAM    = ", level), 1)
+	output = strings.Replace(output, "DirectX:", fmt.Sprintf("|%sDX    = ", level), 1)
 
-	output = strings.Replace(output, "Additional Notes:\n", "\n|notes    = ", 1)
+	output = strings.Replace(output, "Additional Notes:", "\n|notes    = ", 1)
 
 	// Output
 	return output
@@ -72,18 +84,18 @@ func emptySpecs(level string) string {
 `, level, level, level, level, level, level, level, level)
 }
 
-func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequirements Requirements) string {
+func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequirements Requirement) string {
 	var output string = ""
 	var specs string = ""
 
 	if platforms.Windows {
 		output += "|OSfamily = Windows"
-		specs = ProcessSpecs(pcRequirements.Minimum, true)
+		specs = ProcessSpecs(pcRequirements["minimum"].(string), true)
 		output += (specs)
 
 		// Handle recommended specs
-		if pcRequirements.Recommended != nil {
-			specs = ProcessSpecs(*pcRequirements.Recommended, false)
+		if pcRequirements["recommended"] != nil {
+			specs = ProcessSpecs(pcRequirements["recommended"].(string), false)
 			output += (specs)
 		} else {
 			emptySpecs("rec")
@@ -95,12 +107,12 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 
 	if platforms.MAC {
 		output += ("|OSfamily = Mac")
-		specs = ProcessSpecs(macRequirements.Minimum, true)
+		specs = ProcessSpecs(macRequirements["minimum"].(string), true)
 		output += (specs)
 
 		// Handle recommended specs
-		if macRequirements.Recommended != nil {
-			specs = ProcessSpecs(*macRequirements.Recommended, false)
+		if macRequirements["recommended"] != nil {
+			specs = ProcessSpecs(macRequirements["recommended"].(string), false)
 			output += (specs)
 		} else {
 			emptySpecs("rec")
@@ -112,12 +124,12 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 
 	if platforms.Linux {
 		output += ("|OSfamily = Linux")
-		specs = ProcessSpecs(linuxRequirements.Minimum, true)
+		specs = ProcessSpecs(linuxRequirements["minimum"].(string), true)
 		output += (specs)
 
 		// Handle recommended specs
-		if linuxRequirements.Recommended != nil {
-			specs = ProcessSpecs(*linuxRequirements.Recommended, false)
+		if linuxRequirements["recommended"] != nil {
+			specs = ProcessSpecs(linuxRequirements["recommended"].(string), false)
 			output += (specs)
 		} else {
 			emptySpecs("rec")
