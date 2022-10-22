@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.61
+v0.0.63
 
 ## Todo
 
@@ -31,7 +31,7 @@ v0.0.61
 - [ ] Infobox: Taxonomy: Pacing
 - [ ] Infobox: Taxonomy: Perspectives
 - [ ] Infobox: Taxonomy: Controls
-- [ ] Infobox: Taxonomy: Genres
+- [x] Infobox: Taxonomy: Genres
 - [ ] Infobox: Taxonomy: Sports
 - [ ] Infobox: Taxonomy: Vehicles
 - [ ] Infobox: Taxonomy: Art Styles
