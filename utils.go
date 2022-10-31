@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -28,6 +29,35 @@ func OutputGenres(genres []Genre) string {
 	return output
 }
 
+func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Requirement) string {
+	if (platform == "windows" && !platforms.Windows) ||
+		(platform == "mac" && !platforms.MAC) ||
+		(platform == "linux" && !platforms.Linux) {
+		return "unknown"
+	}
+
+	var sanitised = strings.ToLower(requirements["minimum"].(string))
+	sanitised = removeTags(sanitised)
+
+	// Could have just used RAM but hey /shrug/
+	ramFinder, _ := regexp.Compile(`Memory: (\d+) GB`)
+	ramFound := ramFinder.FindStringSubmatch(sanitised)
+	ram, _ := strconv.Atoi(ramFound[1])
+
+	if is32 && (strings.Contains(sanitised, "64-bit") || strings.Contains(sanitised, "64 bit") || ram > 4) {
+		return "false"
+	} else {
+		return "true"
+	}
+}
+
+func removeTags(input string) string {
+	noTag, _ := regexp.Compile(`(<[^>]*>)+`)
+	output := noTag.ReplaceAllLiteralString(input, "\n")
+	output = strings.ReplaceAll(output, "\n ", "")
+	return output
+}
+
 func ProcessSpecs(input string, isMin bool) string {
 	// Create vars
 	var level string
@@ -38,9 +68,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	}
 
 	// Sanitise input and remove HTML tags
-	noTag, _ := regexp.Compile(`(<[^>]*>)+`)
-	output = noTag.ReplaceAllLiteralString(output, "\n")
-	output = strings.ReplaceAll(output, "\n ", "")
+	output = removeTags(output)
 
 	// Cleanup some text, more texts must be added here...
 	output = strings.Replace(output, "Requires a 64-bit processor and operating system", "", 1)
@@ -98,7 +126,7 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 			specs = ProcessSpecs(pcRequirements["recommended"].(string), false)
 			output += (specs)
 		} else {
-			emptySpecs("rec")
+			output += emptySpecs("rec")
 		}
 	}
 
@@ -112,7 +140,7 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 			specs = ProcessSpecs(macRequirements["recommended"].(string), false)
 			output += (specs)
 		} else {
-			emptySpecs("rec")
+			output += emptySpecs("rec")
 		}
 	}
 
@@ -126,7 +154,7 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 			specs = ProcessSpecs(linuxRequirements["recommended"].(string), false)
 			output += (specs)
 		} else {
-			emptySpecs("rec")
+			output += emptySpecs("rec")
 		}
 	}
 

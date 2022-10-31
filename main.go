@@ -436,7 +436,7 @@ func main() {
 		fmt.Println("* [21/24] Processing API!")
 
 		outputFile.WriteString("\n\n==Other information==\n===API===\n{{API")
-		outputFile.WriteString(`
+		outputFile.WriteString(fmt.Sprintf(`
 |direct3d versions      = 
 |direct3d notes         = 
 |directdraw versions    = 
@@ -459,21 +459,24 @@ func main() {
 |dos modes notes        = 
 |shader model versions  = 
 |shader model notes     = 
-|windows 32-bit exe     = unknown
-|windows 64-bit exe     = unknown
+|windows 32-bit exe     = %s
+|windows 64-bit exe     = %s
 |windows arm app        = unknown
 |windows exe notes      = 
 |mac os x powerpc app   = 
-|macos intel 32-bit app = unknown
-|macos intel 64-bit app = unknown
+|macos intel 32-bit app = %s
+|macos intel 64-bit app = %s
 |macos arm app          = unknown
 |macos app notes        = 
 |linux powerpc app      = 
-|linux 32-bit executable= unknown
-|linux 64-bit executable= unknown
+|linux 32-bit executable= %s
+|linux 64-bit executable= %s
 |linux arm app          = unknown
 |linux executable notes = 
-}}`)
+}}`,
+			GetExeBit(true, "windows", game[gameId].Data.Platforms, game[gameId].Data.PCRequirements), GetExeBit(false, "windows", game[gameId].Data.Platforms, game[gameId].Data.PCRequirements),
+			GetExeBit(true, "mac", game[gameId].Data.Platforms, game[gameId].Data.MACRequirements), GetExeBit(false, "mac", game[gameId].Data.Platforms, game[gameId].Data.MACRequirements),
+			GetExeBit(true, "linux", game[gameId].Data.Platforms, game[gameId].Data.LinuxRequirements), GetExeBit(false, "linux", game[gameId].Data.Platforms, game[gameId].Data.LinuxRequirements)))
 
 		fmt.Println("* [22/24] Processing Middleware!")
 

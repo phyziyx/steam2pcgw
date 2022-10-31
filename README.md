@@ -72,7 +72,7 @@ v0.0.63
 - [ ] Input: Controller (PS/Xbox/Others)
 - [ ] Audio
 - [x] Languages (There maybe some discrepancies as Steam API provides very vague info)
-- [ ] API
+- [ ] API (App executable bits detected)
 - [ ] Middleware
 - [x] System Requirements: Windows (Needs manual review)
 - [x] System Requirements: Mac (Needs manual review)
