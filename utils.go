@@ -8,6 +8,15 @@ import (
 	"strings"
 )
 
+func (req *Requirement) UnmarshalJSON(data []byte) error {
+	if string(data) == `""` || string(data) == `{}` || string(data) == `[]` {
+		return nil
+	}
+
+	type requirement Requirement
+	return json.Unmarshal(data, (*requirement)(req))
+}
+
 func UnmarshalGame(data []byte) (Game, error) {
 	var r Game
 	err := json.Unmarshal(data, &r)
@@ -30,25 +39,34 @@ func OutputGenres(genres []Genre) string {
 }
 
 func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Requirement) string {
+	value := "unknown"
+
 	if (platform == "windows" && !platforms.Windows) ||
 		(platform == "mac" && !platforms.MAC) ||
 		(platform == "linux" && !platforms.Linux) {
-		return "unknown"
-	}
-
-	var sanitised = strings.ToLower(requirements["minimum"].(string))
-	sanitised = removeTags(sanitised)
-
-	// Could have just used RAM but hey /shrug/
-	ramFinder, _ := regexp.Compile(`Memory: (\d+) GB`)
-	ramFound := ramFinder.FindStringSubmatch(sanitised)
-	ram, _ := strconv.Atoi(ramFound[1])
-
-	if is32 && (strings.Contains(sanitised, "64-bit") || strings.Contains(sanitised, "64 bit") || ram > 4) {
-		return "false"
 	} else {
-		return "true"
+		var sanitised = strings.ToLower(requirements["minimum"].(string))
+		sanitised = removeTags(sanitised)
+
+		// Could have just used RAM but hey /shrug/
+		ramFinder, _ := regexp.Compile(`memory:(\d+) gb`)
+		ramFound := ramFinder.FindStringSubmatch(sanitised)
+		var ram = 0
+		if len(ramFound) != 0 {
+			ram, _ = strconv.Atoi(ramFound[1])
+		}
+
+		// This may need to be modified!
+		if is32 && (strings.Contains(sanitised, "64-bit") || strings.Contains(sanitised, "64 bit") || ram > 4) {
+			value = "false"
+		} else {
+			value = "true"
+		}
 	}
+
+	fmt.Printf("* [21/24] %s (32-bit: %v): %s\n", platform, is32, value)
+
+	return value
 }
 
 func removeTags(input string) string {

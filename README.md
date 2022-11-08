@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.63
+v0.0.64
 
 ## Todo
 
@@ -72,7 +72,7 @@ v0.0.63
 - [ ] Input: Controller (PS/Xbox/Others)
 - [ ] Audio
 - [x] Languages (There maybe some discrepancies as Steam API provides very vague info)
-- [ ] API (App executable bits detected)
+- [ ] API (App executable bits detected, needs manual review)
 - [ ] Middleware
 - [x] System Requirements: Windows (Needs manual review)
 - [x] System Requirements: Mac (Needs manual review)

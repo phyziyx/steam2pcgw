@@ -23,9 +23,9 @@ type Data struct {
 	SupportedLanguages  string             `json:"supported_languages"`
 	HeaderImage         string             `json:"header_image"`
 	Website             *string            `json:"website"`
-	PCRequirements      Requirement        `json:"pc_requirements"`
-	MACRequirements     Requirement        `json:"mac_requirements"`
-	LinuxRequirements   Requirement        `json:"linux_requirements"`
+	PCRequirements      Requirement        `json:"pc_requirements,omitempty"`
+	MACRequirements     Requirement        `json:"mac_requirements,omitempty"`
+	LinuxRequirements   Requirement        `json:"linux_requirements,omitempty"`
 	Developers          []string           `json:"developers"`
 	Publishers          []string           `json:"publishers"`
 	Packages            []int64            `json:"packages"`

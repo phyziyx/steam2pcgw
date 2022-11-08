@@ -54,7 +54,7 @@ func main() {
 		body, err = os.ReadFile(fmt.Sprintf("%s.json", gameId))
 
 		if err == nil {
-			fmt.Println("Found a game cache!  Using that instead...")
+			fmt.Println("Found game cache!  Using that instead...")
 		} else {
 			response, err = http.Get(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
 
@@ -423,15 +423,15 @@ func main() {
 		fmt.Println("* [20/24] Processing Languages!")
 		languages := ProcessLanguages(game[gameId].Data.SupportedLanguages)
 
-		outputFile.WriteString(`{{L10n|content=`)
+		outputFile.WriteString("\n\n{{L10n|content=")
 
 		for k, v := range languages {
 			outputFile.WriteString(
-				fmt.Sprintf("{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = }}",
+				fmt.Sprintf("\n{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = }}",
 					k, v.UI, v.Audio, v.Subtitles))
 		}
 
-		outputFile.WriteString(`}}\n\n`)
+		outputFile.WriteString("}}\n\n")
 
 		fmt.Println("* [21/24] Processing API!")
 
@@ -480,7 +480,7 @@ func main() {
 
 		fmt.Println("* [22/24] Processing Middleware!")
 
-		outputFile.WriteString("===Middleware===\n{{Middleware\n")
+		outputFile.WriteString("\n===Middleware===\n{{Middleware\n")
 		outputFile.WriteString(`
 |physics          = 
 |physics notes    = 
@@ -499,7 +499,7 @@ func main() {
 }}`)
 
 		fmt.Println("* [23/24] Processing System Requirements!")
-		outputFile.WriteString("\n\n==System requirements=={{System requirements\n\n")
+		outputFile.WriteString("\n\n==System requirements==\n{{System requirements\n")
 
 		outputFile.WriteString(OutputSpecs(game[gameId].Data.Platforms, game[gameId].Data.PCRequirements, game[gameId].Data.MACRequirements, game[gameId].Data.LinuxRequirements))
 		// Output closure
