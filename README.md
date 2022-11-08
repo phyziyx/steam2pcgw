@@ -6,6 +6,16 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 v0.0.66
 
+## How To
+
+1. Either visit the Releases page and download the latest build from there.
+2. Clone or download the ZIP (Press 'Code' → 'Download ZIP'), enter the directory and type `go run`.  Do note, you'll require Go (https://go.dev/doc/install) to do this!
+
+## Contributions
+
+- You are welcome to contribute and improve the code as you see fit.
+- If you wish to discuss your plans for the repo, then please make an issue.
+
 ## Todo
 
 - [ ] Cleanup the code.
