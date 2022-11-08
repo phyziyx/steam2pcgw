@@ -109,7 +109,7 @@ func main() {
 		outputFile.WriteString("{{stub}}\n\n")
 
 		fmt.Println("* [2/24] Adding app cover")
-		outputFile.WriteString(("{{Infobox game\n|cover        = GAME TITLE cover.jpg\n|developers   = "))
+		outputFile.WriteString(fmt.Sprintf("{{Infobox game\n|cover        = %s cover.jpg\n|developers   = ", game[gameId].Data.Name))
 
 		fmt.Println("* [3/24] Adding app developers")
 		for i := 0; i < len(game[gameId].Data.Developers); i++ {
@@ -148,7 +148,7 @@ func main() {
 		// TODO:
 		outputFile.WriteString("\n{{Infobox game/row/taxonomy/microtransactions | }}\n{{Infobox game/row/taxonomy/modes             | Singleplayer }}\n{{Infobox game/row/taxonomy/pacing            | }}\n{{Infobox game/row/taxonomy/perspectives      | }}\n{{Infobox game/row/taxonomy/controls          | }}\n{{Infobox game/row/taxonomy/genres            | ")
 		outputFile.WriteString(OutputGenres(game[gameId].Data.Genres))
-		outputFile.WriteString("}}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | }}\n{{Infobox game/row/taxonomy/series            | PCGW Templates<!-- CHANGE TO THE ACTUAL SERIES NAME IF ONE EXISTS --> }}\n")
+		outputFile.WriteString("}}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | }}\n{{Infobox game/row/taxonomy/series            |  }}\n")
 
 		outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = \n|gogcom id    = \n|gogcom id side = \n|official site= ", gameId))
 		if game[gameId].Data.Website != nil {
@@ -158,7 +158,7 @@ func main() {
 
 		fmt.Println("* [9/24] Processing introduction...")
 		outputFile.WriteString("\n\n{{Introduction\n|introduction      = ")
-		outputFile.WriteString(game[gameId].Data.AboutTheGame)
+		outputFile.WriteString(removeTags(game[gameId].Data.AboutTheGame))
 
 		outputFile.WriteString("\n\n|release history      = ")
 
@@ -279,7 +279,9 @@ func main() {
 
 		fmt.Println("* [17/24] Processing Video!")
 
-		outputFile.WriteString("\n\n==Video=={{Video\n")
+		// TODO: Scan the description to search for widescreen, ray tracing etc support
+
+		outputFile.WriteString("\n\n==Video==\n{{Video\n")
 		outputFile.WriteString(`|wsgf link                  = 
 |widescreen wsgf award      = 
 |multimonitor wsgf award    = 
@@ -322,7 +324,7 @@ func main() {
 
 		fmt.Println("* [18/24] Processing Input!")
 
-		outputFile.WriteString("\n\n==Input=={{Input\n")
+		outputFile.WriteString("\n\n==Input==\n{{Input\n")
 
 		controller := false
 		if game[gameId].Data.ControllerSupport != nil {
@@ -399,6 +401,7 @@ func main() {
 		// TODO:
 		fmt.Println("* [19/24] Processing Audio!")
 
+		outputFile.WriteString("\n\n")
 		outputFile.WriteString(`==Audio==
 {{Audio
 |separate volume           = unknown
@@ -431,7 +434,7 @@ func main() {
 					k, v.UI, v.Audio, v.Subtitles))
 		}
 
-		outputFile.WriteString("}}\n\n")
+		outputFile.WriteString("\n}}\n")
 
 		fmt.Println("* [21/24] Processing API!")
 
@@ -480,7 +483,7 @@ func main() {
 
 		fmt.Println("* [22/24] Processing Middleware!")
 
-		outputFile.WriteString("\n===Middleware===\n{{Middleware\n")
+		outputFile.WriteString("\n\n===Middleware===\n{{Middleware\n")
 		outputFile.WriteString(`
 |physics          = 
 |physics notes    = 
@@ -499,11 +502,9 @@ func main() {
 }}`)
 
 		fmt.Println("* [23/24] Processing System Requirements!")
-		outputFile.WriteString("\n\n==System requirements==\n{{System requirements\n")
+		outputFile.WriteString("\n\n==System requirements==\n")
 
 		outputFile.WriteString(OutputSpecs(game[gameId].Data.Platforms, game[gameId].Data.PCRequirements, game[gameId].Data.MACRequirements, game[gameId].Data.LinuxRequirements))
-		// Output closure
-		outputFile.WriteString("\n}}")
 
 		fmt.Println("* [24/24] Processing References!")
 		outputFile.WriteString("\n\n{{References}}")

@@ -134,6 +134,7 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 	var output string = ""
 	var specs string = ""
 
+	output += "\n{{System requirements\n"
 	if platforms.Windows {
 		output += "|OSfamily = Windows"
 		specs = ProcessSpecs(pcRequirements["minimum"].(string), true)
@@ -147,8 +148,10 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 			output += emptySpecs("rec")
 		}
 	}
+	output += "\n}}\n"
 
 	if platforms.MAC {
+		output += "\n{{System requirements\n"
 		output += ("|OSfamily = Mac")
 		specs = ProcessSpecs(macRequirements["minimum"].(string), true)
 		output += (specs)
@@ -160,9 +163,11 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		} else {
 			output += emptySpecs("rec")
 		}
+		output += "\n}}\n"
 	}
 
 	if platforms.Linux {
+		output += "\n{{System requirements\n"
 		output += ("|OSfamily = Linux")
 		specs = ProcessSpecs(linuxRequirements["minimum"].(string), true)
 		output += (specs)
@@ -174,6 +179,7 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		} else {
 			output += emptySpecs("rec")
 		}
+		output += "\n}}\n"
 	}
 
 	return output
@@ -234,4 +240,34 @@ func ProcessLanguages(input string) Language {
 	}
 
 	return languages
+}
+
+// TODO:
+
+func HasInAppPurchases(Categories []Category) bool {
+	for k := range Categories {
+		if k == 35 {
+			return true
+		}
+	}
+	return false
+}
+
+func HasFullControllerSupport(Categories []Category) bool {
+	for k := range Categories {
+		if k == 28 {
+			return true
+		}
+	}
+	return false
+}
+
+func HasMultiplayerSupport(Categories []Category) bool {
+	for k := range Categories {
+		if k == 1 {
+			return true
+		}
+	}
+
+	return false
 }

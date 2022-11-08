@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.64
+v0.0.66
 
 ## Todo
 
@@ -19,6 +19,7 @@ v0.0.64
 ### Article Status
 
 - [x] Marks the article as stub
+- [x] Infobox: Game Cover (needs manual review)
 - [x] Infobox: Developers
 - [x] Infobox: Publishers
 - [x] Infobox: Release Date
