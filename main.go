@@ -106,7 +106,7 @@ func main() {
 		defer outputFile.Close()
 
 		fmt.Println("* [1/24] Adding stub")
-		outputFile.WriteString("{{stub}}\n\n")
+		outputFile.WriteString("{{stub}}\n")
 
 		fmt.Println("* [2/24] Adding app cover")
 		outputFile.WriteString(fmt.Sprintf("{{Infobox game\n|cover        = %s cover.jpg\n|developers   = ", game[gameId].Data.Name))
@@ -181,12 +181,13 @@ func main() {
 		if game[gameId].Data.Platforms.Windows {
 			platforms += "Windows, "
 		}
+		if game[gameId].Data.Platforms.MAC {
+			platforms += "OS X, "
+		}
 		if game[gameId].Data.Platforms.Linux {
 			platforms += "Linux, "
 		}
-		if game[gameId].Data.Platforms.MAC {
-			platforms += "MAC, "
-		}
+		
 		platforms = strings.TrimSuffix(platforms, ", ")
 
 		outputFile.WriteString(fmt.Sprintf("{{Availability/row| Steam | %s | Steam |  |  | %s }}", gameId, platforms))
@@ -214,7 +215,7 @@ func main() {
 		outputFile.WriteString("\n|freeware               = ")
 		outputFile.WriteString("\n|free-to-play           = ")
 		if game[gameId].Data.IsFree {
-			outputFile.WriteString("true")
+			outputFile.WriteString("The game has such monetization.")
 		}
 		outputFile.WriteString("\n|one-time game purchase = ")
 		if !game[gameId].Data.IsFree {
@@ -269,7 +270,7 @@ func main() {
 |gog galaxy notes          = 
 |origin                    = 
 |origin notes              = 
-|steam cloud               = 
+|steam cloud               = unknown
 |steam cloud notes         = 
 |ubisoft connect           = 
 |ubisoft connect notes     = 
@@ -362,7 +363,7 @@ func main() {
 |xinput controllers notes  = 
 |xbox prompts              = unknown
 |xbox prompts notes        = 
-|impulse triggers          = unknown
+|impulse triggers          = false
 |impulse triggers notes    = 
 |dualshock 4               = unknown
 |dualshock 4 notes         = 
@@ -414,10 +415,10 @@ func main() {
 |closed captions notes     = 
 |mute on focus lost        = unknown
 |mute on focus lost notes  = 
-|royalty free audio        = false
+|royalty free audio        = unknown
 |eax support               = 
 |eax support notes         = 
-|red book cd audio         = 
+|red book cd audio         = false
 |red book cd audio notes   = 
 |general midi audio        = 
 |general midi audio notes  = 
@@ -444,15 +445,15 @@ func main() {
 |direct3d notes         = 
 |directdraw versions    = 
 |directdraw notes       = 
-|wing                   = 
+|wing                   = false
 |wing notes             = 
 |opengl versions        = 
 |opengl notes           = 
-|glide versions         = 
+|glide versions         = false
 |glide notes            = 
 |software mode          = 
 |software mode notes    = 
-|mantle support         = 
+|mantle support         = false
 |mantle support notes   = 
 |metal support          = 
 |metal support notes    = 
@@ -464,17 +465,17 @@ func main() {
 |shader model notes     = 
 |windows 32-bit exe     = %s
 |windows 64-bit exe     = %s
-|windows arm app        = unknown
+|windows arm app        = false
 |windows exe notes      = 
-|mac os x powerpc app   = 
+|mac os x powerpc app   = false
 |macos intel 32-bit app = %s
 |macos intel 64-bit app = %s
 |macos arm app          = unknown
 |macos app notes        = 
-|linux powerpc app      = 
+|linux powerpc app      = false
 |linux 32-bit executable= %s
 |linux 64-bit executable= %s
-|linux arm app          = unknown
+|linux arm app          = false
 |linux executable notes = 
 }}`,
 			GetExeBit(true, "windows", game[gameId].Data.Platforms, game[gameId].Data.PCRequirements), GetExeBit(false, "windows", game[gameId].Data.Platforms, game[gameId].Data.PCRequirements),
