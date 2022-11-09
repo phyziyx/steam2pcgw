@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.66
+v0.0.67
 
 ## How To
 
@@ -14,7 +14,14 @@ v0.0.66
 ## Contributions
 
 - You are welcome to contribute and improve the code as you see fit.
-- If you wish to discuss your plans for the repo, then please make an issue.
+- If you wish to discuss your plans for the repo, then please make an issue first.
+
+## Plans
+
+- Convert into a CLI app.
+- Clean-up the code.
+- Ability to pass in more than one app ID at a time/ parsing more than one article in one go.
+- Add support for other APIs to make the data output more complete.
 
 ## Todo
 
@@ -50,7 +57,7 @@ v0.0.66
 - [ ] Infobox: Taxonomy: Series
 - [x] Infobox: Steam App ID
 - [ ] Infobox: GOG App ID
-- [x] Infobox: Official Website (if available)
+- [x] Infobox: Official Website (or Support Website, whichever is available)
 - [ ] Infobox: HLTB
 - [ ] Infobox: IGDB (Only needs to be set if there is no IGDB reception row, Empty by default for now)
 - [ ] Infobox: Lutris
@@ -75,7 +82,7 @@ v0.0.66
 - [ ] Microtransactions: DLCs
 - [ ] Game Data: Config File Location
 - [ ] Save Game Data: File location
-- [ ] Save Game Sync
+- [x] Save Game Sync (Needs manual review)
 - [ ] Video
 - [ ] Input: Key remapping
 - [ ] Input: Touchscreen

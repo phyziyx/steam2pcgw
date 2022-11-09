@@ -11,11 +11,12 @@ import (
 
 func main() {
 
-	// Try out these:
-	// 2065780
-	// 2139510
-	// 1859120
-	// 585190
+	if len(os.Args) > 1 && os.Args[1] == "-v" {
+		fmt.Println(APP_NAME, VERSION, "(", GH_LINK, ")")
+		return
+	}
+
+	fmt.Println("Running", APP_NAME, VERSION, "(", GH_LINK, ")")
 
 	// Add these:
 	// game[gameId].Data.Categories
@@ -26,8 +27,6 @@ func main() {
 	var err error = nil
 	var response *http.Response
 	var body []byte
-
-	fmt.Println("Running", APP_NAME, VERSION, "(", GH_LINK, ")")
 
 	// Ask for input from the user
 	for len(gameId) == 0 || err != nil {
@@ -153,6 +152,8 @@ func main() {
 		outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = \n|gogcom id    = \n|gogcom id side = \n|official site= ", gameId))
 		if game[gameId].Data.Website != nil {
 			outputFile.WriteString(*game[gameId].Data.Website)
+		} else {
+			outputFile.WriteString(game[gameId].Data.SupportInfo.URL)
 		}
 		outputFile.WriteString("\n|hltb         = \n|igdb         = <!-- Only needs to be set if there is no IGDB reception row -->\n|lutris       = \n|mobygames    = \n|strategywiki = \n|wikipedia    = \n|winehq       = \n|license      = commercial\n}}")
 
@@ -187,7 +188,7 @@ func main() {
 		if game[gameId].Data.Platforms.Linux {
 			platforms += "Linux, "
 		}
-		
+
 		platforms = strings.TrimSuffix(platforms, ", ")
 
 		outputFile.WriteString(fmt.Sprintf("{{Availability/row| Steam | %s | Steam |  |  | %s }}", gameId, platforms))
