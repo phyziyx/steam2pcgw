@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.67
+v0.0.68
 
 ## How To
 
@@ -72,17 +72,17 @@ v0.0.67
 - [x] Availability: Steam
 - [ ] Availability: Other Stores (not the scope of the project yet)
 - [ ] Monetization: Ad-Supported
-- [x] Monetization: DLC
+- [ ] Monetization: DLC
 - [ ] Monetization: Expansion Pack
 - [ ] Monetization: freeware
 - [x] Monetization: free-to-play (F2P / One-time Game Purchase)
 - [ ] Monetization: sponsored
 - [ ] Monetization: subscription
 - [ ] Microtransactions: Microtransactions
-- [ ] Microtransactions: DLCs
-- [ ] Game Data: Config File Location
-- [ ] Save Game Data: File location
-- [x] Save Game Sync (Needs manual review)
+- [x] Microtransactions: DLCs
+- [x] Game Data: Config File Location (needs manual review)
+- [x] Save Game Data: File location (needs manual review)
+- [x] Save Game Sync (Steam cloud only detected! needs manual review)
 - [ ] Video
 - [ ] Input: Key remapping
 - [ ] Input: Touchscreen

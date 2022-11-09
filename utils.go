@@ -90,6 +90,9 @@ func ProcessSpecs(input string, isMin bool) string {
 
 	// Cleanup some text, more texts must be added here...
 	output = strings.Replace(output, "Requires a 64-bit processor and operating system", "", 1)
+	output = strings.ReplaceAll(output, "available space", "")
+	output = strings.ReplaceAll(output, "RAM", "")
+	output = strings.ReplaceAll(output, "Version", "")
 
 	// Determine
 	if isMin {
@@ -111,6 +114,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.Replace(output, "Memory:", fmt.Sprintf("|%sRAM   = ", level), 1)
 	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sVRAM    = ", level), 1)
 	output = strings.Replace(output, "DirectX:", fmt.Sprintf("|%sDX    = ", level), 1)
+	output = strings.Replace(output, "Sound Card:", fmt.Sprintf("|%saudio    = ", level), 1)
 
 	output = strings.Replace(output, "Additional Notes:", "\n|notes    = ", 1)
 
@@ -242,6 +246,16 @@ func ProcessLanguages(input string) Language {
 	return languages
 }
 
+func ParseDate(date string) (output string) {
+	output = date
+	dateRe, _ := regexp.Compile(`(\d+) (\w+), (\d+)`)
+	tokens := dateRe.FindStringSubmatch(date)
+	if len(tokens) != 0 {
+		output = dateRe.ReplaceAllString(date, `$2 $1 $3`)
+	}
+	return output
+}
+
 // TODO:
 
 func HasInAppPurchases(Categories []Category) bool {
@@ -265,6 +279,16 @@ func HasFullControllerSupport(Categories []Category) bool {
 func HasMultiplayerSupport(Categories []Category) bool {
 	for _, v := range Categories {
 		if v.ID == 1 {
+			return true
+		}
+	}
+
+	return false
+}
+
+func HasSteamCloud(Categories []Category) bool {
+	for _, v := range Categories {
+		if v.ID == 23 {
 			return true
 		}
 	}

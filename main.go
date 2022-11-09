@@ -122,7 +122,8 @@ func main() {
 		}
 
 		fmt.Println("* [5/24] Adding app release date")
-		outputFile.WriteString(fmt.Sprintf("\n|engines      = \n|release dates= \n{{Infobox game/row/date|Windows|%s}}", game[gameId].Data.ReleaseDate.Date))
+
+		outputFile.WriteString(fmt.Sprintf("\n|engines      = \n|release dates= \n{{Infobox game/row/date|Windows|%s}}", ParseDate(game[gameId].Data.ReleaseDate.Date)))
 
 		fmt.Println("* [6/24] Adding reception score")
 		if game[gameId].Data.Metacritic != nil {
@@ -135,21 +136,32 @@ func main() {
 
 		outputFile.WriteString(("\n{{Infobox game/row/reception|OpenCritic|link|rating}}\n{{Infobox game/row/reception|IGDB|link|rating}}"))
 
+		outputFile.WriteString("\n|taxonomy     =\n{{Infobox game/row/taxonomy/monetization      | ")
 		if game[gameId].Data.IsFree {
 			fmt.Println("* [7/24] Game is F2P")
-			outputFile.WriteString(("|taxonomy     =\n{{Infobox game/row/taxonomy/monetization      | Free-to-play }}"))
+			outputFile.WriteString(("Free-to-play }}"))
 		} else {
 			fmt.Println("* [7/24] Game is not F2P")
-			outputFile.WriteString(("|taxonomy     =\n{{Infobox game/row/taxonomy/monetization      | One-time game purchase }}"))
+			outputFile.WriteString(("One-time game purchase }}"))
 		}
 
-		fmt.Println("* [8/24] Taxonomy...")
 		// TODO:
+		fmt.Println("* [8/24] Taxonomy...")
 		outputFile.WriteString("\n{{Infobox game/row/taxonomy/microtransactions | }}\n{{Infobox game/row/taxonomy/modes             | Singleplayer }}\n{{Infobox game/row/taxonomy/pacing            | }}\n{{Infobox game/row/taxonomy/perspectives      | }}\n{{Infobox game/row/taxonomy/controls          | }}\n{{Infobox game/row/taxonomy/genres            | ")
 		outputFile.WriteString(OutputGenres(game[gameId].Data.Genres))
-		outputFile.WriteString("}}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | }}\n{{Infobox game/row/taxonomy/series            |  }}\n")
+		outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | }}\n{{Infobox game/row/taxonomy/series            |  }}\n")
 
-		outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = \n|gogcom id    = \n|gogcom id side = \n|official site= ", gameId))
+		outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = \n", gameId))
+		if game[gameId].Data.Dlc != nil {
+			var dlcs string = ""
+			for _, v := range game[gameId].Data.Dlc {
+				dlcs += fmt.Sprintf("%v, ", v)
+			}
+			dlcs = strings.TrimSuffix(dlcs, ", ")
+			outputFile.WriteString(dlcs)
+		}
+		outputFile.WriteString("||gogcom id    = \n|gogcom id side = \n|official site= ")
+
 		if game[gameId].Data.Website != nil {
 			outputFile.WriteString(*game[gameId].Data.Website)
 		} else {
@@ -175,7 +187,7 @@ func main() {
 
 		fmt.Println("* [10/24] Processing Availability!")
 
-		outputFile.WriteString("\n\n==Availability==\n{{Availability|")
+		outputFile.WriteString("\n\n==Availability==\n{{Availability|\n")
 
 		var platforms string = ""
 
@@ -202,16 +214,6 @@ func main() {
 		outputFile.WriteString("{{Monetization")
 		outputFile.WriteString("\n|ad-supported           = ")
 		outputFile.WriteString("\n|dlc                    = ")
-
-		if game[gameId].Data.Dlc != nil {
-			var dlcs string = ""
-			for _, v := range game[gameId].Data.Dlc {
-				dlcs += fmt.Sprintf("%v, ", v)
-			}
-			dlcs = strings.TrimSuffix(dlcs, ", ")
-			outputFile.WriteString(dlcs)
-		}
-
 		outputFile.WriteString("\n|expansion pack         = ")
 		outputFile.WriteString("\n|freeware               = ")
 		outputFile.WriteString("\n|free-to-play           = ")
@@ -250,14 +252,30 @@ func main() {
 
 		outputFile.WriteString("\n\n==Game data==\n===Configuration file(s) location===")
 		outputFile.WriteString("\n{{Game data|")
-		outputFile.WriteString("\n{{Game data/config|Windows|}}")
+		if game[gameId].Data.Platforms.Windows {
+			outputFile.WriteString("\n{{Game data/config|Windows|}}")
+		}
+		if game[gameId].Data.Platforms.MAC {
+			outputFile.WriteString("\n{{Game data/config|OS X|}}")
+		}
+		if game[gameId].Data.Platforms.Linux {
+			outputFile.WriteString("\n{{Game data/config|Linux|}}")
+		}
 		outputFile.WriteString("\n}}")
 
 		fmt.Println("* [15/24] Processing Save Game Location!")
 
 		outputFile.WriteString("\n\n===Save game data location===")
 		outputFile.WriteString("\n{{Game data|")
-		outputFile.WriteString("\n{{Game data/saves|Windows|}}")
+		if game[gameId].Data.Platforms.Windows {
+			outputFile.WriteString("\n{{Game data/saves|Windows|}}")
+		}
+		if game[gameId].Data.Platforms.MAC {
+			outputFile.WriteString("\n{{Game data/saves|OS X|}}")
+		}
+		if game[gameId].Data.Platforms.Linux {
+			outputFile.WriteString("\n{{Game data/saves|Linux|}}")
+		}
 		outputFile.WriteString("\n}}")
 
 		fmt.Println("* [16/24] Processing Save Game Sync!")
@@ -271,18 +289,30 @@ func main() {
 |gog galaxy notes          = 
 |origin                    = 
 |origin notes              = 
-|steam cloud               = unknown
-|steam cloud notes         = 
+|steam cloud               = `)
+
+		// Game has steam cloud, then we can just add it
+		// Otherwise, we can check if the game is out yet or not
+		// to determine whether we should add `unknown` or `false`
+		if HasSteamCloud(game[gameId].Data.Categories) {
+			outputFile.WriteString("true")
+		} else {
+			if game[gameId].Data.ReleaseDate.ComingSoon {
+				outputFile.WriteString("unknown")
+			} else {
+				outputFile.WriteString("false")
+			}
+		}
+
+		outputFile.WriteString(`|steam cloud notes         = 
 |ubisoft connect           = 
 |ubisoft connect notes     = 
 |xbox cloud                = 
 |xbox cloud notes          = 
 }}`)
 
-		fmt.Println("* [17/24] Processing Video!")
-
 		// TODO: Scan the description to search for widescreen, ray tracing etc support
-
+		fmt.Println("* [17/24] Processing Video!")
 		outputFile.WriteString("\n\n==Video==\n{{Video\n")
 		outputFile.WriteString(`|wsgf link                  = 
 |widescreen wsgf award      = 
@@ -400,7 +430,6 @@ func main() {
 |steam cursor detection notes = 
 }}`)
 
-		// TODO:
 		fmt.Println("* [19/24] Processing Audio!")
 
 		outputFile.WriteString("\n\n")
