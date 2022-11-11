@@ -104,6 +104,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.ReplaceAll(output, "available space", "")
 	output = strings.ReplaceAll(output, "RAM", "")
 	output = strings.ReplaceAll(output, "Version ", "")
+	output = strings.ReplaceAll(output, "Windows ", "")
 
 	networkRe := regexp.MustCompile(`Network:(.+)\n`)
 	output = networkRe.ReplaceAllLiteralString(output, "")
@@ -121,15 +122,15 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sOS    = ", level), 1)
 
 	// Processor stuff
-	cpuRegEx := regexp.MustCompile(`Processor:(.+)(?: or |/|,|\|)+(.+)\n`)
+	cpuRegEx := regexp.MustCompile(`(Processor:)(.+)(?: or |/|,|\|)+(.+)\n`)
 	cpus := cpuRegEx.FindStringSubmatch(output)
 
-	if len(cpus) == 3 {
-		output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[1], level, cpus[2]))
+	if len(cpus) == 4 {
+		output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[2], level, cpus[3]))
 	} else {
 		cpuRegEx = regexp.MustCompile(`Processor:(.+)\n`)
 		cpus = cpuRegEx.FindStringSubmatch(output)
-		output = strings.Replace(output, "Processor:", fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[0], level, cpus[0]), 1)
+		output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[1], level, cpus[1]))
 	}
 
 	output = strings.TrimSuffix(strings.Replace(output, "Storage:", fmt.Sprintf("|%sHD    = ", level), 1), " ")
@@ -138,7 +139,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	gpuRegEx := regexp.MustCompile(`Graphics:(.+)\n`)
 	gpus := gpuRegEx.FindStringSubmatch(output)
 	if strings.Contains(gpus[0], "OpenGL") {
-		output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, gpus[1]))
+		output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
 	} else {
 		output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[1], level, gpus[1]))
 	}
@@ -146,7 +147,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.TrimSuffix(strings.Replace(output, "Memory:", fmt.Sprintf("|%sRAM   = ", level), 1), " ")
 	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sVRAM    = ", level), 1)
 	output = strings.Replace(output, "DirectX:", fmt.Sprintf("|%sDX    = ", level), 1)
-	output = strings.Replace(output, "Sound Card:", fmt.Sprintf("|%saudio    = ", level), 1)
+	output = strings.Replace(output, "Sound Card:", fmt.Sprintf("|%saudio = ", level), 1)
 
 	output = strings.Replace(output, "Additional Notes:", "\n|notes    = ", 1)
 
