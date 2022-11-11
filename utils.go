@@ -23,14 +23,25 @@ func UnmarshalGame(data []byte) (Game, error) {
 	return r, err
 }
 
-func (r *Game) Marshal() ([]byte, error) {
-	return json.Marshal(r)
+func isBlacklistedGenre(genre string) bool {
+	blacklisted := []string{"Early Access", "Indie", "Casual"}
+	for _, listedGenre := range blacklisted {
+		if genre == listedGenre {
+			return true
+		}
+	}
+
+	return false
 }
 
 func OutputGenres(genres []Genre) string {
 	var output = ""
 
 	for _, v := range genres {
+		if isBlacklistedGenre(v.Description) {
+			continue
+		}
+
 		output += v.Description + ", "
 	}
 	output = strings.TrimSuffix(output, ", ")
@@ -94,23 +105,40 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.ReplaceAll(output, "RAM", "")
 	output = strings.ReplaceAll(output, "Version", "")
 
+	networkRe := regexp.MustCompile(`Network:(.+)\n`)
+	output = networkRe.ReplaceAllLiteralString(output, "")
+
 	// Determine
 	if isMin {
 		level = "min"
-		output = strings.Replace(output, "Minimum:", "", 1)
+		output = strings.Replace(output, "Minimum:\n", "", 1)
 	} else {
 		level = "rec"
-		output = strings.Replace(output, "Recommended:", "", 1)
+		output = strings.Replace(output, "Recommended:\n", "", 1)
 	}
 
 	// Replace
 	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sOS    = ", level), 1)
 
-	output = strings.Replace(output, "Processor:", fmt.Sprintf("|%sCPU    = |%sCPU2    = ", level, level), 1)
+	// Processor stuff
+	cpuRegEx := regexp.MustCompile(`Processor:(.+)(?: or |/|,|\|)+(.+)\n`)
+	cpus := cpuRegEx.FindStringSubmatch(output)
+
+	if len(cpus) == 3 {
+		output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[1], level, cpus[2]))
+	} else {
+		cpuRegEx = regexp.MustCompile(`Processor:(.+)\n`)
+		cpus = cpuRegEx.FindStringSubmatch(output)
+		output = strings.Replace(output, "Processor:", fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[0], level, cpus[0]), 1)
+	}
 
 	output = strings.Replace(output, "Storage:", fmt.Sprintf("|%sHD    = ", level), 1)
 
-	output = strings.Replace(output, "Graphics:", fmt.Sprintf("|%sGPU    = |%sGPU2    = ", level, level), 1)
+	// Graphics stuff
+	gpuRegEx := regexp.MustCompile(`Graphics:(.+)\n`)
+	gpus := gpuRegEx.FindStringSubmatch(output)
+	output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s", level, gpus[1], level, gpus[1]))
+
 	output = strings.Replace(output, "Memory:", fmt.Sprintf("|%sRAM   = ", level), 1)
 	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sVRAM    = ", level), 1)
 	output = strings.Replace(output, "DirectX:", fmt.Sprintf("|%sDX    = ", level), 1)
@@ -156,7 +184,7 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 
 	if platforms.MAC {
 		output += "\n{{System requirements\n"
-		output += ("|OSfamily = Mac")
+		output += ("|OSfamily = OS X")
 		specs = ProcessSpecs(macRequirements["minimum"].(string), true)
 		output += (specs)
 
@@ -283,6 +311,15 @@ func HasMultiplayerSupport(Categories []Category) bool {
 		}
 	}
 
+	return false
+}
+
+func IsEarlyAccess(genres []Genre) bool {
+	for _, v := range genres {
+		if v.Description == "Early Access" {
+			return true
+		}
+	}
 	return false
 }
 

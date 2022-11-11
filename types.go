@@ -51,17 +51,6 @@ type Metacritic struct {
 	URL   string `json:"url"`
 }
 
-type Sub struct {
-	Packageid                int64  `json:"packageid"`
-	PercentSavingsText       string `json:"percent_savings_text"`
-	PercentSavings           int64  `json:"percent_savings"`
-	OptionText               string `json:"option_text"`
-	OptionDescription        string `json:"option_description"`
-	CanGetFreeLicense        string `json:"can_get_free_license"`
-	IsFreeLicense            bool   `json:"is_free_license"`
-	PriceInCentsWithDiscount int64  `json:"price_in_cents_with_discount"`
-}
-
 type Platforms struct {
 	Windows bool `json:"windows"`
 	MAC     bool `json:"mac"`

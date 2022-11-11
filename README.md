@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.68
+v0.0.69
 
 ## How To
 
@@ -18,20 +18,13 @@ v0.0.68
 
 ## Plans
 
-- Convert into a CLI app.
-- Clean-up the code.
-- Ability to pass in more than one app ID at a time/ parsing more than one article in one go.
-- Add support for other APIs to make the data output more complete.
-
-## Todo
-
-- [ ] Cleanup the code.
-- [ ] Save cache in a sub-folder, and take the time and date of that cache into account.  Fetch new data from the API if the cache is older than seven days.
-- [ ] IGDB and OpenCritic support.
-
-## Features
-
-- [x] Caching
+- [ ] Convert into a CLI app
+- [ ] Clean-up the code
+- [ ] Ability to pass in more than one app ID at a time/ parsing more than one article in one go
+- [ ] Add support for other APIs to make the data output more complete
+- [ ] Save cache in a sub-folder, fetch new data if cache is older than seven days
+- [ ] IGDB and OpenCritic support
+- [ ] Download game covers
 
 ### Article Status
 
@@ -82,7 +75,7 @@ v0.0.68
 - [x] Microtransactions: DLCs
 - [x] Game Data: Config File Location (needs manual review)
 - [x] Save Game Data: File location (needs manual review)
-- [x] Save Game Sync (Steam cloud only detected! needs manual review)
+- [x] Save Game Sync (Steam cloud detected! needs manual review)
 - [ ] Video
 - [ ] Input: Key remapping
 - [ ] Input: Touchscreen
@@ -96,3 +89,9 @@ v0.0.68
 - [x] System Requirements: Mac (Needs manual review)
 - [x] System Requirements: Linux (Needs manual review)
 - [x] References
+
+## Special Thanks
+
+- Dandelion Sprout - first contribution, vital feedback and testing
+- Baron Smoki - vital feedback and testing
+- Dave247 - vital feedback and testing
