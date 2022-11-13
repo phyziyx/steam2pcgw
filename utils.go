@@ -122,26 +122,38 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sOS    = ", level), 1)
 
 	// Processor stuff
-	cpuRegEx := regexp.MustCompile(`(Processor:)(.+)(?: or |/|,|\|)+(.+)\n`)
-	cpus := cpuRegEx.FindStringSubmatch(output)
+	if strings.Contains(output, "Processor:") {
+		cpuRegEx := regexp.MustCompile(`(Processor:)(.+)(?: or |/|,|\|)+(.+)\n`)
+		cpus := cpuRegEx.FindStringSubmatch(output)
 
-	if len(cpus) == 4 {
-		output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[2], level, cpus[3]))
-	} else {
-		cpuRegEx = regexp.MustCompile(`Processor:(.+)\n`)
-		cpus = cpuRegEx.FindStringSubmatch(output)
-		output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[1], level, cpus[1]))
+		if len(cpus) == 4 {
+			output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[2], level, strings.TrimPrefix(cpus[3], " ")))
+		} else {
+			cpuRegEx = regexp.MustCompile(`Processor:(.+)\n`)
+			cpus = cpuRegEx.FindStringSubmatch(output)
+			output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[1], level, cpus[1]))
+		}
 	}
 
 	output = strings.TrimSuffix(strings.Replace(output, "Storage:", fmt.Sprintf("|%sHD    = ", level), 1), " ")
 
 	// Graphics stuff
-	gpuRegEx := regexp.MustCompile(`Graphics:(.+)\n`)
-	gpus := gpuRegEx.FindStringSubmatch(output)
-	if strings.Contains(gpus[0], "OpenGL") {
-		output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
-	} else {
-		output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[1], level, gpus[1]))
+	if strings.Contains(output, "Graphics:") {
+		gpuRegEx := regexp.MustCompile(`Graphics:(.+)\n`)
+		gpus := gpuRegEx.FindStringSubmatch(output)
+		if strings.Contains(gpus[0], "OpenGL") {
+			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
+		} else {
+			// Did not find OpenGL stuff, this means we can do a different regex then...
+			gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+)(?: or |/|,|\|)+(.+)\n`)
+			gpus := gpuRegEx2.FindStringSubmatch(output)
+			if len(gpus) == 4 {
+				output = gpuRegEx2.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[2], level, strings.TrimPrefix(gpus[3], " ")))
+			} else {
+				gpus := gpuRegEx.FindStringSubmatch(output)
+				output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[1], level, gpus[1]))
+			}
+		}
 	}
 
 	output = strings.TrimSuffix(strings.Replace(output, "Memory:", fmt.Sprintf("|%sRAM   = ", level), 1), " ")

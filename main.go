@@ -11,15 +11,12 @@ import (
 
 func main() {
 
-	if len(os.Args) > 1 && os.Args[1] == "-v" {
+	if len(os.Args) > 1 && strings.ToLower(os.Args[1]) == "-v" {
 		fmt.Println(APP_NAME, VERSION, "(", GH_LINK, ")")
 		return
 	}
 
 	fmt.Println("Running", APP_NAME, VERSION, "(", GH_LINK, ")")
-
-	// Add these:
-	// game[gameId].Data.Categories
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -122,7 +119,7 @@ func main() {
 		}
 
 		fmt.Println("* [5/24] Adding app release date")
-		outputFile.WriteString("\n|engines      = \n|release dates= \n")
+		outputFile.WriteString("\n|engines      =\n{{Infobox game/row/engine|ENGINE NAME}}\n|release dates= \n")
 
 		var date string = ""
 		if IsEarlyAccess(game[gameId].Data.Genres) {
@@ -132,15 +129,15 @@ func main() {
 		}
 
 		if game[gameId].Data.Platforms.Windows {
-			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| Windows | %s }}", date))
+			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| Windows | %s }}\n", date))
 		}
 
 		if game[gameId].Data.Platforms.MAC {
-			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| OS X | %s }}", date))
+			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| OS X | %s }}\n", date))
 		}
 
 		if game[gameId].Data.Platforms.Linux {
-			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| Linux | %s }}", date))
+			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| Linux | %s }}\n", date))
 		}
 
 		fmt.Println("* [6/24] Adding reception score")
@@ -312,8 +309,7 @@ func main() {
 |gog galaxy notes          = 
 |origin                    = 
 |origin notes              = 
-|steam cloud               = 
-`)
+|steam cloud               = `)
 
 		// Game has steam cloud, then we can just add it
 		// Otherwise, we can check if the game is out yet or not
@@ -328,7 +324,8 @@ func main() {
 			}
 		}
 
-		outputFile.WriteString(`|steam cloud notes         = 
+		outputFile.WriteString(`
+|steam cloud notes         = 
 |ubisoft connect           = 
 |ubisoft connect notes     = 
 |xbox cloud                = 
@@ -404,6 +401,8 @@ func main() {
 		outputFile.WriteString(fmt.Sprintf("\n|controller support        = %v\n|controller support notes  = \n|full controller           = ", controller))
 		if controller && *game[gameId].Data.ControllerSupport == "full" {
 			outputFile.WriteString("true")
+		} else {
+			outputFile.WriteString("false")
 		}
 		outputFile.WriteString("\n|full controller notes     = ")
 

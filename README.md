@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.69
+v0.0.70
 
 ## How To
 
@@ -95,3 +95,4 @@ v0.0.69
 - Dandelion Sprout - first contribution, vital feedback and testing
 - Baron Smoki - vital feedback and testing
 - Dave247 - vital feedback and testing
+- Mine18 - vital feedback and testing
