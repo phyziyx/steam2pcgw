@@ -123,7 +123,7 @@ func ProcessSpecs(input string, isMin bool) string {
 
 	// Processor stuff
 	if strings.Contains(output, "Processor:") {
-		cpuRegEx := regexp.MustCompile(`(Processor:)(.+)(?: or |/|,|\|)+(.+)\n`)
+		cpuRegEx := regexp.MustCompile(`(Processor:)(.+?)(?: or |/|,|\|)+(.+)\n`)
 		cpus := cpuRegEx.FindStringSubmatch(output)
 
 		if len(cpus) == 4 {
@@ -145,7 +145,7 @@ func ProcessSpecs(input string, isMin bool) string {
 			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
 		} else {
 			// Did not find OpenGL stuff, this means we can do a different regex then...
-			gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+)(?: or |/|,|\|)+(.+)\n`)
+			gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+?)(?: or |/|,|\|)+(.+)\n`)
 			gpus := gpuRegEx2.FindStringSubmatch(output)
 			if len(gpus) == 4 {
 				output = gpuRegEx2.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[2], level, strings.TrimPrefix(gpus[3], " ")))
