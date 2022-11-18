@@ -119,7 +119,7 @@ func main() {
 		}
 
 		fmt.Println("* [5/24] Adding app release date")
-		outputFile.WriteString("\n|engines      =\n{{Infobox game/row/engine|ENGINE NAME}}\n|release dates= \n")
+		outputFile.WriteString("\n|engines      =\n{{Infobox game/row/engine|}}\n|release dates= \n")
 
 		var date string = ""
 		if IsEarlyAccess(game[gameId].Data.Genres) {
@@ -129,15 +129,15 @@ func main() {
 		}
 
 		if game[gameId].Data.Platforms.Windows {
-			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| Windows | %s }}\n", date))
+			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date|Windows| %s }}\n", date))
 		}
 
 		if game[gameId].Data.Platforms.MAC {
-			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| OS X | %s }}\n", date))
+			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date|OS X| %s }}\n", date))
 		}
 
 		if game[gameId].Data.Platforms.Linux {
-			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date| Linux | %s }}\n", date))
+			outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date|Linux| %s }}\n", date))
 		}
 
 		fmt.Println("* [6/24] Adding reception score")
@@ -493,10 +493,9 @@ func main() {
 
 		fmt.Println("* [21/24] Processing API!")
 
-		outputFile.WriteString("\n\n==Other information==\n===API===\n{{API")
-		outputFile.WriteString(fmt.Sprintf(`
-|direct3d versions      = 
-|direct3d notes         = 
+		outputFile.WriteString("\n\n==Other information==\n===API===\n{{API\n")
+		outputFile.WriteString(fmt.Sprintf("|direct3d versions      = %s\n", FindDirectX(game[gameId].Data.PCRequirements)))
+		outputFile.WriteString(fmt.Sprintf(`|direct3d notes         = 
 |directdraw versions    = 
 |directdraw notes       = 
 |wing                   = false

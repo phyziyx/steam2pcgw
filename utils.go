@@ -87,6 +87,21 @@ func removeTags(input string) string {
 	return output
 }
 
+func FindDirectX(pcRequirements Requirement) string {
+	if len(pcRequirements["minimum"].(string)) == 0 {
+		return ""
+	}
+
+	sanitised := removeTags(pcRequirements["minimum"].(string))
+	dxRegex := regexp.MustCompile(`DirectX:(.+)\n`)
+	version := dxRegex.FindStringSubmatch(sanitised)
+	if len(version) == 2 {
+		return strings.Trim(version[1], "Version ")
+	}
+
+	return ""
+}
+
 func ProcessSpecs(input string, isMin bool) string {
 	// Create vars
 	var level string
@@ -145,7 +160,7 @@ func ProcessSpecs(input string, isMin bool) string {
 			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
 		} else {
 			// Did not find OpenGL stuff, this means we can do a different regex then...
-			gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+?)(?: or |/|,|\|)+(.+)\n`)
+			gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+)(?: or |/|,|\|)+(.+)\n`)
 			gpus := gpuRegEx2.FindStringSubmatch(output)
 			if len(gpus) == 4 {
 				output = gpuRegEx2.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[2], level, strings.TrimPrefix(gpus[3], " ")))
