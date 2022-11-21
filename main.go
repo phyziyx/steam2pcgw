@@ -176,7 +176,7 @@ func main() {
 			dlcs += "\n"
 			outputFile.WriteString(dlcs)
 		}
-		outputFile.WriteString("||gogcom id    = \n|gogcom id side = \n|official site= ")
+		outputFile.WriteString("|gogcom id    = \n|gogcom id side = \n|official site= ")
 
 		if game[gameId].Data.Website != nil {
 			outputFile.WriteString(*game[gameId].Data.Website)
