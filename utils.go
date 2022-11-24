@@ -1,11 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func (req *Requirement) UnmarshalJSON(data []byte) error {
@@ -21,6 +27,67 @@ func UnmarshalGame(data []byte) (Game, error) {
 	var r Game
 	err := json.Unmarshal(data, &r)
 	return r, err
+}
+
+func ParseGame(gameId string) (body []byte, err error) {
+	fileName := fmt.Sprintf("%s.json", gameId)
+	fi, err := os.Stat(fileName)
+
+	if err != nil || time.Since(fi.ModTime()).Hours() > (7*24) {
+		fmt.Println("Did not find game cache or cache is older than 7 days...")
+
+		var response *http.Response
+		response, err = http.Get(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
+
+		if err != nil {
+			fmt.Printf("Failed to connect to the Steam API... (error: %s)\n", err)
+			return
+		}
+
+		if response.StatusCode != http.StatusOK {
+			fmt.Printf("Failed to connect to the Steam API... (HTTP code: %d)\n", response.StatusCode)
+			return
+		}
+		defer response.Body.Close()
+
+		body, err = io.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println("An error occurred while attempting to parse the response body...")
+			return
+		}
+
+		var cache *os.File
+		cache, err = os.Create(fmt.Sprintf("%s.json", gameId))
+		if err != nil {
+			fmt.Println("Failed to cache the game... Process continuing...")
+		} else {
+			cache.WriteString(string(body))
+			fmt.Println("Cached the game...")
+		}
+		cache.Close()
+	} else {
+		body, err = os.ReadFile(fileName)
+	}
+
+	return body, err
+}
+
+func TakeInput() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+
+	// For Windows and Linux
+	text = strings.TrimSuffix(text, "\n")
+	// For Windows
+	text = strings.TrimSuffix(text, "\r")
+
+	fmt.Printf("Sanitised text: '%s' (len: %d)\n", text, len(text))
+
+	if len(text) == 0 {
+		return "", errors.New("Invalid input")
+	}
+
+	return text, nil
 }
 
 func isBlacklistedGenre(genre string) bool {
