@@ -34,8 +34,8 @@ v0.0.70
 - [x] Infobox: Publishers
 - [x] Infobox: Release Date
 - [x] Infobox: Reception: Metacritic (if available)
-- [ ] Infobox: Reception: OpenCritic (if available)
-- [ ] Infobox: Reception: IGDB (if available)
+- [ ] Infobox: Reception: OpenCritic (NOT AVAILABLE)
+- [ ] Infobox: Reception: IGDB (NOT AVAILABLE)
 - [x] Infobox: Taxomony: F2P / One-time Game Purchase
 - [ ] Infobox: Taxonomy: Microtransactions
 - [ ] Infobox: Taxonomy: Modes (defaults to Singleplayer for now)
@@ -60,8 +60,8 @@ v0.0.70
 - [ ] Infobox: WineHQ
 - [ ] Infobox: License (defaults to Commercial for now)
 - [x] Introduction: Introduction
-- [x] Introduction: Release History (generic)
-- [ ] Introduction: Current State (impossible?)
+- [x] Introduction: Release History (Generic)
+- [x] Introduction: Current State (EMPTY)
 - [x] Availability: Steam
 - [ ] Availability: Other Stores (not the scope of the project yet)
 - [ ] Monetization: Ad-Supported
@@ -73,21 +73,21 @@ v0.0.70
 - [ ] Monetization: subscription
 - [ ] Microtransactions: Microtransactions
 - [x] Microtransactions: DLCs
-- [x] Game Data: Config File Location (needs manual review)
-- [x] Save Game Data: File location (needs manual review)
-- [x] Save Game Sync (Steam cloud detected! needs manual review)
+- [x] Game Data: Config File Location (Add file location)
+- [x] Save Game Data: File location (Add file location)
+- [x] Save Game Sync (Steam cloud detected! Add file location)
 - [ ] Video
 - [ ] Input: Key remapping
 - [ ] Input: Touchscreen
 - [x] Input: Controller Support, Full Controller
-- [ ] Input: Controller (PS/Xbox/Others)
+- [ ] Input: Controller (PS/Xbox/Others) (IMPOSSIBLE)
 - [ ] Audio
-- [x] Languages (There maybe some discrepancies as Steam API provides very vague info)
+- [x] Languages (There maybe some discrepancies as Steam API provides very vague info - No discrepancies reported so far)
 - [ ] API (App executable bits detected, needs manual review)
 - [ ] Middleware
-- [x] System Requirements: Windows (Needs manual review)
-- [x] System Requirements: Mac (Needs manual review)
-- [x] System Requirements: Linux (Needs manual review)
+- [x] System Requirements: Windows (CPU and GPU sections may need review)
+- [x] System Requirements: Mac (CPU and GPU sections may need review)
+- [x] System Requirements: Linux (CPU and GPU sections may need review)
 - [x] References
 
 ## Special Thanks
