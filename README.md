@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.70
+v0.0.71
 
 ## How To
 
@@ -18,7 +18,7 @@ v0.0.70
 
 ## Plans
 
-- [ ] Convert into a CLI app
+- [x] Convert into a CLI app
 - [ ] Clean-up the code
 - [ ] Ability to pass in more than one app ID at a time/ parsing more than one article in one go
 - [ ] Add support for other APIs to make the data output more complete
@@ -63,7 +63,7 @@ v0.0.70
 - [x] Introduction: Release History (Generic)
 - [x] Introduction: Current State (EMPTY)
 - [x] Availability: Steam
-- [ ] Availability: Other Stores (not the scope of the project yet)
+- [ ] Availability: Other Stores (Outside the scope of the project)
 - [ ] Monetization: Ad-Supported
 - [ ] Monetization: DLC
 - [ ] Monetization: Expansion Pack
