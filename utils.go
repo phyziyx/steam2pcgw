@@ -84,7 +84,7 @@ func TakeInput() (string, error) {
 	fmt.Printf("Sanitised text: '%s' (len: %d)\n", text, len(text))
 
 	if len(text) == 0 {
-		return "", errors.New("Invalid input")
+		return "", errors.New("invalid input")
 	}
 
 	return text, nil
