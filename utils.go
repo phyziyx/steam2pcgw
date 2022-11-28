@@ -383,8 +383,6 @@ func ParseDate(date string) (output string) {
 	return output
 }
 
-// TODO:
-
 func HasInAppPurchases(Categories []Category) bool {
 	for _, v := range Categories {
 		if v.ID == 35 {

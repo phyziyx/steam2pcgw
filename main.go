@@ -469,8 +469,6 @@ func main() {
 |vulkan notes           = 
 |dos modes              = 
 |dos modes notes        = 
-|shader model versions  = 
-|shader model notes     = 
 |windows 32-bit exe     = %s
 |windows 64-bit exe     = %s
 |windows arm app        = false
