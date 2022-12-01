@@ -160,6 +160,9 @@ func main() {
 	outputFile.WriteString("\n\n|current state     = ")
 	outputFile.WriteString("\n}}")
 
+	outputFile.WriteString("\n\n'''General information'''")
+	outputFile.WriteString("\n{{mm}} [https://steamcommunity.com/app/" + gameId + "/discussions/ Steam Community Discussions]")
+
 	fmt.Println("* [10/24] Processing Availability!")
 
 	outputFile.WriteString("\n\n==Availability==\n{{Availability|\n")
