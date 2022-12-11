@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -442,10 +443,17 @@ func main() {
 
 	outputFile.WriteString("\n\n{{L10n|content=")
 
-	for k, v := range languages {
+	orderedLangauges := make([]string, 0, len(languages))
+	for key := range languages {
+		orderedLangauges = append(orderedLangauges, key)
+	}
+
+	sort.Strings(orderedLangauges)
+
+	for _, key := range orderedLangauges {
 		outputFile.WriteString(
 			fmt.Sprintf("\n{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = }}",
-				k, v.UI, v.Audio, v.Subtitles))
+				key, languages[key].UI, languages[key].Audio, languages[key].Subtitles))
 	}
 
 	outputFile.WriteString("\n}}\n")
