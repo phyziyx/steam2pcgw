@@ -63,14 +63,14 @@ func main() {
 	outputFile.WriteString(fmt.Sprintf("{{Infobox game\n|cover        = %s cover.jpg\n|developers   = ", game[gameId].Data.Name))
 
 	fmt.Println("* [3/24] Adding app developers")
-	for i := 0; i < len(game[gameId].Data.Developers); i++ {
-		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/developer|%s}}", game[gameId].Data.Developers[i]))
+	for _, developer := range game[gameId].Data.Developers {
+		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/developer|%s}}", developer))
 	}
 
 	fmt.Println("* [4/24] Adding app publishers")
 	outputFile.WriteString(("\n|publishers   = "))
-	for i := 0; i < len(game[gameId].Data.Publishers); i++ {
-		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/publisher|%s}}", game[gameId].Data.Publishers[i]))
+	for _, publisher := range game[gameId].Data.Publishers {
+		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/publisher|%s}}", publisher))
 	}
 
 	fmt.Println("* [5/24] Adding app release date")
@@ -79,6 +79,8 @@ func main() {
 	var date string = ""
 	if IsEarlyAccess(game[gameId].Data.Genres) {
 		date += "EA"
+	} else if game[gameId].Data.ReleaseDate.ComingSoon {
+		date += "TBA"
 	} else {
 		date += ParseDate(game[gameId].Data.ReleaseDate.Date)
 	}
@@ -147,7 +149,6 @@ func main() {
 	outputFile.WriteString("\n\n|release history      = ")
 
 	if game[gameId].Data.ReleaseDate.ComingSoon {
-		outputFile.WriteString("Releases on ")
 	} else {
 		outputFile.WriteString("Released on ")
 	}
