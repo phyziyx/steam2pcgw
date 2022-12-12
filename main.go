@@ -561,6 +561,26 @@ func main() {
 |anticheat notes  = 
 }}`)
 
+	if HasMultiplayerSupport(game[gameId].Data.Categories) {
+		outputFile.WriteString("\n\n===Network===\n{{{{Network/Multiplayer\n")
+		outputFile.WriteString(`
+|local play           = 
+|local play players   = 
+|local play modes     = 
+|local play notes     = 
+|lan play             = 
+|lan play players     = 
+|lan play modes       = 
+|lan play notes       = 
+|online play          = 
+|online play players  = 
+|online play modes    = 
+|online play notes    = 
+|asynchronous         = 
+|asynchronous notes   = 
+}}`)
+	}
+
 	fmt.Println("* [23/24] Processing System Requirements!")
 	outputFile.WriteString("\n\n==System requirements==\n")
 
