@@ -61,17 +61,30 @@ func main() {
 	outputFile.WriteString("{{stub}}\n")
 
 	fmt.Println("* [2/24] Adding app cover")
-	outputFile.WriteString(fmt.Sprintf("{{Infobox game\n|cover        = %s cover.jpg\n|developers   = ", game[gameId].Data.Name))
+	outputFile.WriteString(fmt.Sprintf("{{Infobox game\n|cover        = %s cover.jpg", SanitiseName(game[gameId].Data.Name, true)))
 
 	fmt.Println("* [3/24] Adding app developers")
+	outputFile.WriteString("\n|developers   = ")
 	for _, developer := range game[gameId].Data.Developers {
-		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/developer|%s}}", developer))
+		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/developer|%s}}", SanitiseName(developer, false)))
 	}
 
 	fmt.Println("* [4/24] Adding app publishers")
-	outputFile.WriteString(("\n|publishers   = "))
+	outputFile.WriteString("\n|publishers   = ")
 	for _, publisher := range game[gameId].Data.Publishers {
-		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/publisher|%s}}", publisher))
+		if len(game[gameId].Data.Publishers) == 1 {
+			skip := false
+			for _, developer := range game[gameId].Data.Developers {
+				if developer == publisher {
+					skip = true
+					break
+				}
+			}
+			if skip {
+				continue
+			}
+		}
+		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/publisher|%s}}", SanitiseName(publisher, false)))
 	}
 
 	fmt.Println("* [5/24] Adding app release date")
@@ -120,7 +133,22 @@ func main() {
 
 	// TODO:
 	fmt.Println("* [8/24] Taxonomy...")
-	outputFile.WriteString("\n{{Infobox game/row/taxonomy/microtransactions | }}\n{{Infobox game/row/taxonomy/modes             | Singleplayer }}\n{{Infobox game/row/taxonomy/pacing            | }}\n{{Infobox game/row/taxonomy/perspectives      | }}\n{{Infobox game/row/taxonomy/controls          | }}\n{{Infobox game/row/taxonomy/genres            | ")
+	outputFile.WriteString("\n{{Infobox game/row/taxonomy/microtransactions | }}\n{{Infobox game/row/taxonomy/modes             | ")
+
+	modes := ""
+
+	if HasSinglePlayerSupport(game[gameId].Data.Categories) {
+		modes += "Singleplayer, "
+	}
+
+	if HasMultiplayerSupport(game[gameId].Data.Categories) {
+		modes += "Multiplayer, "
+	}
+
+	modes = strings.TrimSuffix(modes, ", ")
+	outputFile.WriteString(modes)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/pacing            | }}\n{{Infobox game/row/taxonomy/perspectives      | }}\n{{Infobox game/row/taxonomy/controls          | }}\n{{Infobox game/row/taxonomy/genres            | ")
 	outputFile.WriteString(OutputGenres(game[gameId].Data.Genres))
 	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | }}\n{{Infobox game/row/taxonomy/series            |  }}\n")
 
@@ -377,7 +405,7 @@ func main() {
 |xinput controllers notes  = 
 |xbox prompts              = unknown
 |xbox prompts notes        = 
-|impulse triggers          = false
+|impulse triggers          = unknown
 |impulse triggers notes    = 
 |dualshock 4               = unknown
 |dualshock 4 notes         = 
@@ -432,7 +460,7 @@ func main() {
 |royalty free audio notes  = 
 |eax support               = 
 |eax support notes         = 
-|red book cd audio         = false
+|red book cd audio         =
 |red book cd audio notes   = 
 |general midi audio        = 
 |general midi audio notes  = 
@@ -450,10 +478,29 @@ func main() {
 
 	sort.Strings(orderedLangauges)
 
+	// find English and swap it to be the first language instead...
+
+	if orderedLangauges[0] != "English" {
+		// Only swap English to the first language if it isn't already...
+
+		foundIndex := 0
+		for i := 1; i < len(orderedLangauges); i++ {
+			if orderedLangauges[i] == "English" {
+				foundIndex = i
+				break
+			}
+		}
+
+		if foundIndex != 0 {
+			for i := 0; i < foundIndex-1; i++ {
+				orderedLangauges[i+1] = orderedLangauges[i]
+			}
+			orderedLangauges[0] = "English"
+		}
+	}
+
 	for _, key := range orderedLangauges {
-		outputFile.WriteString(
-			fmt.Sprintf("\n{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = }}",
-				key, languages[key].UI, languages[key].Audio, languages[key].Subtitles))
+		outputFile.WriteString(FormatLanguage(key, languages))
 	}
 
 	outputFile.WriteString("\n}}\n")
@@ -465,15 +512,15 @@ func main() {
 	outputFile.WriteString(fmt.Sprintf(`|direct3d notes         = 
 |directdraw versions    = 
 |directdraw notes       = 
-|wing                   = false
+|wing                   = 
 |wing notes             = 
 |opengl versions        = 
 |opengl notes           = 
-|glide versions         = false
+|glide versions         = 
 |glide notes            = 
 |software mode          = 
 |software mode notes    = 
-|mantle support         = false
+|mantle support         = 
 |mantle support notes   = 
 |metal support          = 
 |metal support notes    = 
@@ -528,5 +575,5 @@ func main() {
 	fmt.Println("* [24/24] Processing References!")
 	outputFile.WriteString("\n{{References}}")
 
-	println(fmt.Sprintf("Successfully parsed information for game: '%s'", game[gameId].Data.Name))
+	println(fmt.Sprintf("Successfully parsed information for game: '%s'", SanitiseName(game[gameId].Data.Name, true)))
 }

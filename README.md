@@ -4,7 +4,7 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Version
 
-v0.0.71
+v0.0.72
 
 ## How To
 
@@ -38,7 +38,7 @@ v0.0.71
 - [ ] Infobox: Reception: IGDB (NOT AVAILABLE)
 - [x] Infobox: Taxomony: F2P / One-time Game Purchase
 - [ ] Infobox: Taxonomy: Microtransactions
-- [ ] Infobox: Taxonomy: Modes (defaults to Singleplayer for now)
+- [x] Infobox: Taxonomy: Modes
 - [ ] Infobox: Taxonomy: Pacing
 - [ ] Infobox: Taxonomy: Perspectives
 - [ ] Infobox: Taxonomy: Controls
@@ -96,3 +96,4 @@ v0.0.71
 - Baron Smoki - vital feedback and testing
 - Dave247 - vital feedback and testing
 - Mine18 - vital feedback and testing
+- Mrtnptrs - vital feedback and testing

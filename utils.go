@@ -81,8 +81,6 @@ func TakeInput() (string, error) {
 	// For Windows
 	text = strings.TrimSuffix(text, "\r")
 
-	fmt.Printf("Sanitised text: '%s' (len: %d)\n", text, len(text))
-
 	if len(text) == 0 {
 		return "", errors.New("invalid input")
 	}
@@ -383,6 +381,24 @@ func ParseDate(date string) (output string) {
 	return output
 }
 
+func FormatLanguage(language string, languages Language) string {
+	sanitisedLanguage := language
+	sanitisedLanguage = strings.Replace(sanitisedLanguage, "Spanish - Spain", "Spanish", 1)
+	sanitisedLanguage = strings.Replace(sanitisedLanguage, "Spanish - Latin America", "Latin American Spanish", 1)
+
+	return fmt.Sprintf("\n{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = \n}}",
+		sanitisedLanguage, languages[language].UI, languages[language].Audio, languages[language].Subtitles)
+}
+
+func SanitiseName(name string, title bool) string {
+	name = strings.ReplaceAll(name, "™", "")
+	if !title {
+		// game titles can have LLC
+		name = strings.ReplaceAll(name, " LLC", "")
+	}
+	return name
+}
+
 func HasInAppPurchases(Categories []Category) bool {
 	for _, v := range Categories {
 		if v.ID == 35 {
@@ -404,6 +420,16 @@ func HasFullControllerSupport(Categories []Category) bool {
 func HasMultiplayerSupport(Categories []Category) bool {
 	for _, v := range Categories {
 		if v.ID == 1 {
+			return true
+		}
+	}
+
+	return false
+}
+
+func HasSinglePlayerSupport(Categories []Category) bool {
+	for _, v := range Categories {
+		if v.ID == 2 {
 			return true
 		}
 	}
