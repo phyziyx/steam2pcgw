@@ -41,7 +41,7 @@ func makeRequest(url string) (*http.Response, error) {
 
 func doesCacheExistOrLatest(fileName string) bool {
 	fi, err := os.Stat(fileName)
-	return err != nil || time.Since(fi.ModTime()).Hours() > (7*24)
+	return err == nil && time.Since(fi.ModTime()).Hours() < (7*24)
 }
 
 func createCache(fileName string, data []byte) error {
@@ -52,37 +52,39 @@ func ParseGame(gameId string) (body []byte, err error) {
 
 	fileName := fmt.Sprintf("%s.json", gameId)
 
-	if !doesCacheExistOrLatest(fileName) {
-		fmt.Println("Did not find game cache or cache is older than 7 days...")
-
-		var response *http.Response
-		response, err = makeRequest(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
-
-		if err != nil {
-			fmt.Printf("Failed to connect to the Steam API... (error: %s)\n", err)
-			return
-		}
-
-		if response.StatusCode != http.StatusOK {
-			fmt.Printf("Failed to connect to the Steam API... (HTTP code: %d)\n", response.StatusCode)
-			return
-		}
-		defer response.Body.Close()
-
-		body, err = io.ReadAll(response.Body)
-		if err != nil {
-			fmt.Println("An error occurred while attempting to parse the response body...")
-			return
-		}
-
-		err = createCache(fileName, body)
-		if err != nil {
-			fmt.Println("Failed to create the cache, but continuing the process...")
-		} else {
-			fmt.Println("Cached!")
-		}
-	} else {
+	if doesCacheExistOrLatest(fileName) {
+		fmt.Println("Found cache...")
 		body, err = os.ReadFile(fileName)
+		return
+	}
+
+	fmt.Println("Did not find game cache or cache is older than 7 days...")
+
+	var response *http.Response
+	response, err = makeRequest(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
+
+	if err != nil {
+		fmt.Printf("Failed to connect to the Steam API... (error: %s)\n", err)
+		return
+	}
+
+	if response.StatusCode != http.StatusOK {
+		fmt.Printf("Failed to connect to the Steam API... (HTTP code: %d)\n", response.StatusCode)
+		return
+	}
+	defer response.Body.Close()
+
+	body, err = io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println("An error occurred while attempting to parse the response body...")
+		return
+	}
+
+	err = createCache(fileName, body)
+	if err != nil {
+		fmt.Println("Failed to create the cache, but continuing the process...")
+	} else {
+		fmt.Println("Cached!")
 	}
 
 	return body, err
