@@ -179,7 +179,7 @@ func main() {
 	outputFile.WriteString("\n\n{{Introduction\n|introduction      = ")
 	// outputFile.WriteString(removeTags(game[gameId].Data.AboutTheGame))
 
-	outputFile.WriteString("\n\n|release history      = ")
+	outputFile.WriteString("\n\n|release history   = ")
 
 	outputFile.WriteString("\n\n|current state     = ")
 	outputFile.WriteString("\n}}")
@@ -543,7 +543,7 @@ func main() {
 
 	fmt.Println("* [22/24] Processing Middleware!")
 
-	outputFile.WriteString("\n\n===Middleware===\n{{Middleware\n")
+	outputFile.WriteString("\n\n===Middleware===\n{{Middleware")
 	outputFile.WriteString(`
 |physics          = 
 |physics notes    = 
@@ -562,7 +562,7 @@ func main() {
 }}`)
 
 	if HasMultiplayerSupport(game[gameId].Data.Categories) {
-		outputFile.WriteString("\n\n===Network===\n{{{{Network/Multiplayer\n")
+		outputFile.WriteString("\n\n===Network===\n{{Network/Multiplayer")
 		outputFile.WriteString(`
 |local play           = 
 |local play players   = 

@@ -29,15 +29,34 @@ func UnmarshalGame(data []byte) (Game, error) {
 	return r, err
 }
 
-func ParseGame(gameId string) (body []byte, err error) {
-	fileName := fmt.Sprintf("%s.json", gameId)
-	fi, err := os.Stat(fileName)
+func makeRequest(url string) (*http.Response, error) {
+	resp, err := http.Get(url)
 
-	if err != nil || time.Since(fi.ModTime()).Hours() > (7*24) {
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func doesCacheExistOrLatest(fileName string) bool {
+	fi, err := os.Stat(fileName)
+	return err != nil || time.Since(fi.ModTime()).Hours() > (7*24)
+}
+
+func createCache(fileName string, data []byte) error {
+	return os.WriteFile(fileName, data, 0777)
+}
+
+func ParseGame(gameId string) (body []byte, err error) {
+
+	fileName := fmt.Sprintf("%s.json", gameId)
+
+	if !doesCacheExistOrLatest(fileName) {
 		fmt.Println("Did not find game cache or cache is older than 7 days...")
 
 		var response *http.Response
-		response, err = http.Get(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
+		response, err = makeRequest(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
 
 		if err != nil {
 			fmt.Printf("Failed to connect to the Steam API... (error: %s)\n", err)
@@ -56,15 +75,12 @@ func ParseGame(gameId string) (body []byte, err error) {
 			return
 		}
 
-		var cache *os.File
-		cache, err = os.Create(fmt.Sprintf("%s.json", gameId))
+		err = createCache(fileName, body)
 		if err != nil {
-			fmt.Println("Failed to cache the game... Process continuing...")
+			fmt.Println("Failed to create the cache, but continuing the process...")
 		} else {
-			cache.WriteString(string(body))
-			fmt.Println("Cached the game...")
+			fmt.Println("Cached!")
 		}
-		cache.Close()
 	} else {
 		body, err = os.ReadFile(fileName)
 	}
