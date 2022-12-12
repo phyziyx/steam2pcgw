@@ -94,7 +94,11 @@ func main() {
 	if IsEarlyAccess(game[gameId].Data.Genres) {
 		date += "EA"
 	} else if game[gameId].Data.ReleaseDate.ComingSoon {
-		date += "TBA"
+		if success, _ := IsDate(game[gameId].Data.ReleaseDate.Date); success {
+			date += ParseDate(game[gameId].Data.ReleaseDate.Date)
+		} else {
+			date += "TBA"
+		}
 	} else {
 		date += ParseDate(game[gameId].Data.ReleaseDate.Date)
 	}
@@ -176,16 +180,6 @@ func main() {
 	// outputFile.WriteString(removeTags(game[gameId].Data.AboutTheGame))
 
 	outputFile.WriteString("\n\n|release history      = ")
-
-	if game[gameId].Data.ReleaseDate.ComingSoon {
-	} else {
-		outputFile.WriteString("Released on ")
-	}
-	outputFile.WriteString(game[gameId].Data.ReleaseDate.Date)
-
-	if IsEarlyAccess(game[gameId].Data.Genres) {
-		outputFile.WriteString(" in Early Access.")
-	}
 
 	outputFile.WriteString("\n\n|current state     = ")
 	outputFile.WriteString("\n}}")
