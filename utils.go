@@ -142,19 +142,33 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 		var sanitised = strings.ToLower(requirements["minimum"].(string))
 		sanitised = removeTags(sanitised)
 
-		// Could have just used RAM but hey /shrug/
-		ramFinder, _ := regexp.Compile(`memory:(\d+) gb`)
-		ramFound := ramFinder.FindStringSubmatch(sanitised)
-		var ram = 0
-		if len(ramFound) != 0 {
-			ram, _ = strconv.Atoi(ramFound[1])
-		}
-
-		// This may need to be modified!
-		if is32 && (strings.Contains(sanitised, "64-bit") || strings.Contains(sanitised, "64 bit") || ram > 4) {
-			value = "false"
+		if strings.Contains(sanitised, "Requires a 64-bit processor and operating system") {
+			if is32 {
+				value = "false"
+			} else {
+				value = "true"
+			}
 		} else {
-			value = "true"
+			ramFinder := regexp.MustCompile(`memory:(\d+) gb`)
+			ramFound := ramFinder.FindStringSubmatch(sanitised)
+
+			var ram = 0
+			if len(ramFound) != 0 {
+				ram, _ = strconv.Atoi(ramFound[1])
+				ram *= 1000
+			} else {
+				ramFinder = regexp.MustCompile(`memory:(\d+) mb`)
+				ramFound = ramFinder.FindStringSubmatch(sanitised)
+				if len(ramFound) != 0 {
+					ram, _ = strconv.Atoi(ramFound[1])
+				}
+			}
+
+			if is32 && (strings.Contains(sanitised, "64-bit") || strings.Contains(sanitised, "64 bit") || ram > 4096) {
+				value = "false"
+			} else {
+				value = "true"
+			}
 		}
 	}
 
@@ -243,13 +257,20 @@ func ProcessSpecs(input string, isMin bool) string {
 			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
 		} else {
 			// Did not find OpenGL stuff, this means we can do a different regex then...
-			gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+)(?: or |/|,|\|)+(.+)\n`)
-			gpus := gpuRegEx2.FindStringSubmatch(output)
-			if len(gpus) == 4 {
-				output = gpuRegEx2.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[2], level, strings.TrimPrefix(gpus[3], " ")))
+			// Thanks Dandelion Sprout for this amazing RegEx
+			gpuRegEx3 := regexp.MustCompile(`(Graphics:)([a-zA-Z0-9.;' -]{1,})(, |/| / )([a-zA-Z0-9.;' -]{1,})(, |/| / )([a-zA-Z0-9.;' -]{1,})`)
+			gpus = gpuRegEx3.FindStringSubmatch(output)
+			if len(gpus) == 7 {
+				output = gpuRegEx3.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU     = %s\n|%sGPU2    = %s\n|%sGPU3    = %s", level, gpus[2], level, gpus[4], level, gpus[6]))
 			} else {
-				gpus := gpuRegEx.FindStringSubmatch(output)
-				output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[1], level, gpus[1]))
+				gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+)(?: or |/|,|\|)+(.+)\n`)
+				gpus := gpuRegEx2.FindStringSubmatch(output)
+				if len(gpus) == 4 {
+					output = gpuRegEx2.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[2], level, strings.TrimPrefix(gpus[3], " ")))
+				} else {
+					gpus := gpuRegEx.FindStringSubmatch(output)
+					output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[1], level, gpus[1]))
+				}
 			}
 		}
 	}
@@ -273,8 +294,7 @@ func emptySpecs(level string) string {
 |%sHD    = 
 |%sGPU   = 
 |%sGPU2  = 
-|%sVRAM  = 
-`, level, level, level, level, level, level, level, level)
+|%sVRAM  = `, level, level, level, level, level, level, level, level)
 }
 
 func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequirements Requirement) string {
@@ -285,12 +305,12 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		output += "\n{{System requirements\n"
 		output += "|OSfamily = Windows"
 		specs = ProcessSpecs(pcRequirements["minimum"].(string), true)
-		output += (specs)
+		output += specs
 
 		// Handle recommended specs
 		if pcRequirements["recommended"] != nil {
 			specs = ProcessSpecs(pcRequirements["recommended"].(string), false)
-			output += (specs)
+			output += specs
 		} else {
 			output += emptySpecs("rec")
 		}
@@ -301,12 +321,12 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		output += "\n{{System requirements\n"
 		output += ("|OSfamily = OS X")
 		specs = ProcessSpecs(macRequirements["minimum"].(string), true)
-		output += (specs)
+		output += specs
 
 		// Handle recommended specs
 		if macRequirements["recommended"] != nil {
 			specs = ProcessSpecs(macRequirements["recommended"].(string), false)
-			output += (specs)
+			output += specs
 		} else {
 			output += emptySpecs("rec")
 		}
@@ -317,12 +337,12 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		output += "\n{{System requirements\n"
 		output += ("|OSfamily = Linux")
 		specs = ProcessSpecs(linuxRequirements["minimum"].(string), true)
-		output += (specs)
+		output += specs
 
 		// Handle recommended specs
 		if linuxRequirements["recommended"] != nil {
 			specs = ProcessSpecs(linuxRequirements["recommended"].(string), false)
-			output += (specs)
+			output += specs
 		} else {
 			output += emptySpecs("rec")
 		}

@@ -154,7 +154,7 @@ func main() {
 
 	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/pacing            | }}\n{{Infobox game/row/taxonomy/perspectives      | }}\n{{Infobox game/row/taxonomy/controls          | }}\n{{Infobox game/row/taxonomy/genres            | ")
 	outputFile.WriteString(OutputGenres(game[gameId].Data.Genres))
-	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | }}\n{{Infobox game/row/taxonomy/series            |  }}\n")
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | }}\n{{Infobox game/row/taxonomy/series            | }}\n")
 
 	outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = \n", gameId))
 	if game[gameId].Data.Dlc != nil {
@@ -241,7 +241,10 @@ func main() {
 	outputFile.WriteString("\n|infinite spend      = ")
 	outputFile.WriteString("\n|free-to-grind       = ")
 	outputFile.WriteString("\n|loot box            = ")
-	outputFile.WriteString("\n|none                = None")
+	outputFile.WriteString("\n|none                = ")
+	if !HasInAppPurchases(game[gameId].Data.Categories) {
+		outputFile.WriteString("None")
+	}
 	outputFile.WriteString("\n|player trading      = ")
 	outputFile.WriteString("\n|time-limited        = ")
 	outputFile.WriteString("\n|unlock              = ")
@@ -359,7 +362,7 @@ func main() {
 
 	fmt.Println("* [18/24] Processing Input!")
 
-	outputFile.WriteString("\n\n==Input==\n{{Input\n")
+	outputFile.WriteString("\n\n==Input==\n{{Input")
 
 	controller := false
 	if game[gameId].Data.ControllerSupport != nil {
