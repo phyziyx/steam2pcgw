@@ -2,6 +2,15 @@
 
 The goal of this tool is to simplify the process of creating new articles for the PC Gaming Wiki by just simply entering the Steam App ID.
 
+## Why Should I Use This?
+
+Well, it's certainly up to you to decide whether you want to use it or not, and no one will force you to use it, but there are good reasons why you should, even if certain templates:
+
+- Games with massive DLCs, such as ETS2/ATS/Cities Skylines to name a few.
+- Parses most system requirements FLAWLESSLY!
+- Fills in most of the information available from the API which could be used to copy-paste and modify as you go!
+- Makes it harder to not skip something while filling in the information.
+
 ## Version
 
 v0.0.72
@@ -22,7 +31,7 @@ v0.0.72
 - [ ] Clean-up the code
 - [ ] Ability to pass in more than one app ID at a time/ parsing more than one article in one go
 - [ ] Add support for other APIs to make the data output more complete
-- [ ] Save cache in a sub-folder, fetch new data if cache is older than seven days
+- [ ] Save cache in a sub-folder, fetch new data if cache is older than seven days (partially done)
 - [ ] IGDB and OpenCritic support
 - [ ] Download game covers
 
