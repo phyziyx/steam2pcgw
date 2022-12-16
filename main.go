@@ -135,9 +135,12 @@ func main() {
 		outputFile.WriteString(("One-time game purchase }}"))
 	}
 
-	// TODO:
 	fmt.Println("* [8/24] Taxonomy...")
-	outputFile.WriteString("\n{{Infobox game/row/taxonomy/microtransactions | }}\n{{Infobox game/row/taxonomy/modes             | ")
+	outputFile.WriteString("\n{{Infobox game/row/taxonomy/microtransactions | ")
+	if !HasInAppPurchases(game[gameId].Data.Categories) {
+		outputFile.WriteString("None")
+	}
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/modes             | ")
 
 	modes := ""
 
