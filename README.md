@@ -4,11 +4,11 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 ## Why Should I Use This?
 
-Well, it's certainly up to you to decide whether you want to use it or not, and no one will force you to use it, but there are good reasons why you should, even if certain templates:
+Well, it's certainly up to you to decide whether you want to use it or not, and no one will force you to use it, but there are good reasons why you should, even if for certain templates:
 
 - Games with massive DLCs, such as ETS2/ATS/Cities Skylines to name a few.
 - Parses most system requirements FLAWLESSLY!
-- Fills in most of the information available from the API which could be used to copy-paste and modify as you go!
+- Fills in most of the information available from the API which you may copy-paste and modify as you go!
 - Makes it harder to not skip something while filling in the information.
 
 ## Version
