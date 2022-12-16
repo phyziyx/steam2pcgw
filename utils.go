@@ -280,7 +280,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	output = strings.Replace(output, "DirectX:", fmt.Sprintf("|%sDX    = ", level), 1)
 	output = strings.Replace(output, "Sound Card:", fmt.Sprintf("|%saudio = ", level), 1)
 
-	output = strings.Replace(output, "Additional Notes:", "\n|notes    = ", 1)
+	output = strings.Replace(output, "Additional Notes:", "\n|notes    = {{ii}}", 1)
 
 	// Output
 	return output
