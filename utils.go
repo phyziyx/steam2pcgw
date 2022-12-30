@@ -117,6 +117,16 @@ func isBlacklistedGenre(genre string) bool {
 	return false
 }
 
+func OutputThemes(game GameValue) string {
+	var output = ""
+
+	if game.Data.RequiredAge >= 18 {
+		output += "Adult"
+	}
+
+	return output
+}
+
 func OutputGenres(genres []Genre) string {
 	var output = ""
 

@@ -9,6 +9,7 @@ type GameValue struct {
 
 type Data struct {
 	Name                string      `json:"name"`
+	RequiredAge         int         `json:"required_age"`
 	IsFree              bool        `json:"is_free"`
 	ControllerSupport   *string     `json:"controller_support,omitempty"`
 	Dlc                 []int64     `json:"dlc,omitempty"`
