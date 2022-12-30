@@ -13,7 +13,7 @@ Well, it's certainly up to you to decide whether you want to use it or not, and 
 
 ## Version
 
-v0.0.72
+v0.0.73
 
 ## How To
 
@@ -47,15 +47,15 @@ v0.0.72
 - [ ] Infobox: Reception: IGDB (NOT AVAILABLE)
 - [x] Infobox: Taxomony: F2P / One-time Game Purchase
 - [ ] Infobox: Taxonomy: Microtransactions
-- [x] Infobox: Taxonomy: Modes
+- [x] Infobox: Taxonomy: Modes (Singleplayer and Multiplayer)
 - [ ] Infobox: Taxonomy: Pacing
 - [ ] Infobox: Taxonomy: Perspectives
 - [ ] Infobox: Taxonomy: Controls
-- [x] Infobox: Taxonomy: Genres
+- [x] Infobox: Taxonomy: Genres (and removes invalid genres)
 - [ ] Infobox: Taxonomy: Sports
 - [ ] Infobox: Taxonomy: Vehicles
 - [ ] Infobox: Taxonomy: Art Styles
-- [ ] Infobox: Taxonomy: Themes
+- [x] Infobox: Taxonomy: Themes (detects Adult only)
 - [ ] Infobox: Taxonomy: Series
 - [x] Infobox: Steam App ID
 - [ ] Infobox: GOG App ID
