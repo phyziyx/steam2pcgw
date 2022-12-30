@@ -494,8 +494,8 @@ func main() {
 		}
 
 		if foundIndex != 0 {
-			for i := 0; i < foundIndex-1; i++ {
-				orderedLangauges[i+1] = orderedLangauges[i]
+			for i := foundIndex; i > 0; i-- {
+				orderedLangauges[i] = orderedLangauges[i-1]
 			}
 			orderedLangauges[0] = "English"
 		}
