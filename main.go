@@ -117,7 +117,7 @@ func main() {
 	}
 
 	fmt.Println("* [6/25] Adding reception score")
-	outputFile.WriteString("|reception    = \n{{Infobox game/row/reception|Metacritic|")
+	outputFile.WriteString("\n|reception    = \n{{Infobox game/row/reception|Metacritic|")
 	if game.Data.Metacritic != nil {
 		fmt.Println("* [6/25] Added Metacritic")
 		outputFile.WriteString(fmt.Sprintf("%s|%d}}", game.Data.Metacritic.URL, game.Data.Metacritic.Score))
