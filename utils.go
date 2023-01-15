@@ -316,7 +316,8 @@ func ProcessSpecs(input string, isMin bool) string {
 	}
 
 	// Replace
-	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sOS    = ", level), 1)
+	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sOS     = ", level), 1)
+	output = strings.Replace(output, "VR Support:", fmt.Sprintf("|%sother  = ", level), 1)
 
 	// Processor stuff
 	if strings.Contains(output, "Processor:") {
@@ -324,48 +325,48 @@ func ProcessSpecs(input string, isMin bool) string {
 		cpus := cpuRegEx.FindStringSubmatch(output)
 
 		if len(cpus) == 4 {
-			output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[2], level, strings.TrimPrefix(cpus[3], " ")))
+			output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU    = %s\n|%sCPU2   = %s\n", level, cpus[2], level, strings.TrimPrefix(cpus[3], " ")))
 		} else {
 			cpuRegEx = regexp.MustCompile(`Processor:(.+)\n`)
 			cpus = cpuRegEx.FindStringSubmatch(output)
-			output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU   = %s\n|%sCPU2  = %s\n", level, cpus[1], level, cpus[1]))
+			output = cpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sCPU    = %s\n|%sCPU2   = %s\n", level, cpus[1], level, cpus[1]))
 		}
 	}
 
-	output = strings.TrimSuffix(strings.Replace(output, "Storage:", fmt.Sprintf("|%sHD    = ", level), 1), " ")
+	output = strings.TrimSuffix(strings.Replace(output, "Storage:", fmt.Sprintf("|%sHD     = ", level), 1), " ")
 
 	// Graphics stuff
 	if strings.Contains(output, "Graphics:") {
 		gpuRegEx := regexp.MustCompile(`Graphics:(.+)\n`)
 		gpus := gpuRegEx.FindStringSubmatch(output)
 		if strings.Contains(gpus[0], "OpenGL") {
-			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL   = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
+			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL    = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
 		} else {
 			// Did not find OpenGL stuff, this means we can do a different regex then...
 			// Thanks Dandelion Sprout for this amazing RegEx
 			gpuRegEx3 := regexp.MustCompile(`(Graphics:)([a-zA-Z0-9.;' -]{1,})(, |/| / )([a-zA-Z0-9.;' -]{1,})(, |/| / )([a-zA-Z0-9.;' -]{1,})`)
 			gpus = gpuRegEx3.FindStringSubmatch(output)
 			if len(gpus) == 7 {
-				output = gpuRegEx3.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n|%sGPU3  = %s", level, gpus[2], level, gpus[4], level, gpus[6]))
+				output = gpuRegEx3.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU    = %s\n|%sGPU2   = %s\n|%sGPU3   = %s", level, gpus[2], level, gpus[4], level, gpus[6]))
 			} else {
 				gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+)(?: or |/|,|\|)+(.+)\n`)
 				gpus := gpuRegEx2.FindStringSubmatch(output)
 				if len(gpus) == 4 {
-					output = gpuRegEx2.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[2], level, strings.TrimPrefix(gpus[3], " ")))
+					output = gpuRegEx2.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU    = %s\n|%sGPU2   = %s\n", level, gpus[2], level, strings.TrimPrefix(gpus[3], " ")))
 				} else {
 					gpus := gpuRegEx.FindStringSubmatch(output)
-					output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n", level, gpus[1], level, gpus[1]))
+					output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU    = %s\n|%sGPU2   = %s\n", level, gpus[1], level, gpus[1]))
 				}
 			}
 		}
 	}
 
-	output = strings.TrimSuffix(strings.Replace(output, "Memory:", fmt.Sprintf("|%sRAM   = ", level), 1), " ")
-	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sVRAM    = ", level), 1)
-	output = strings.Replace(output, "DirectX:", fmt.Sprintf("|%sDX    = ", level), 1)
-	output = strings.Replace(output, "Sound Card:", fmt.Sprintf("|%saudio = ", level), 1)
+	output = strings.TrimSuffix(strings.Replace(output, "Memory:", fmt.Sprintf("|%sRAM    = ", level), 1), " ")
+	output = strings.Replace(output, "OS:", fmt.Sprintf("|%sVRAM     = ", level), 1)
+	output = strings.Replace(output, "DirectX:", fmt.Sprintf("|%sDX     = ", level), 1)
+	output = strings.Replace(output, "Sound Card:", fmt.Sprintf("|%saudio  = ", level), 1)
 
-	output = strings.Replace(output, "Additional Notes:", "\n|notes    = {{ii}}", 1)
+	output = strings.Replace(output, "Additional Notes:", "\n|notes     = {{ii}}", 1)
 
 	// Output
 	return output

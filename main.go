@@ -270,20 +270,20 @@ func main() {
 	outputFile.WriteString("\n\n==Monetization==\n")
 
 	outputFile.WriteString("{{Monetization")
-	outputFile.WriteString("\n|ad-supported           = ")
-	outputFile.WriteString("\n|dlc                    = ")
-	outputFile.WriteString("\n|expansion pack         = ")
-	outputFile.WriteString("\n|freeware               = ")
-	outputFile.WriteString("\n|free-to-play           = ")
+	outputFile.WriteString("\n|ad-supported                = ")
+	outputFile.WriteString("\n|dlc                         = ")
+	outputFile.WriteString("\n|expansion pack              = ")
+	outputFile.WriteString("\n|freeware                    = ")
+	outputFile.WriteString("\n|free-to-play                = ")
 	if game.Data.IsFree {
 		outputFile.WriteString("The game has such monetization.")
 	}
-	outputFile.WriteString("\n|one-time game purchase = ")
+	outputFile.WriteString("\n|one-time game purchase      = ")
 	if !game.Data.IsFree {
 		outputFile.WriteString("The game requires an upfront purchase to access.")
 	}
-	outputFile.WriteString("\n|sponsored              = ")
-	outputFile.WriteString("\n|subscription           = ")
+	outputFile.WriteString("\n|sponsored                   = ")
+	outputFile.WriteString("\n|subscription                = ")
 	outputFile.WriteString("\n|subscription gaming service = ")
 	outputFile.WriteString("\n}}")
 
@@ -510,10 +510,10 @@ func main() {
 |closed captions notes     = 
 |mute on focus lost        = unknown
 |mute on focus lost notes  = 
-|royalty free audio        = unknown
-|royalty free audio notes  = 
 |eax support               = 
 |eax support notes         = 
+|royalty free audio        = unknown
+|royalty free audio notes  = 
 |red book cd audio         =
 |red book cd audio notes   = 
 |general midi audio        = 
@@ -681,7 +681,7 @@ func main() {
 }}`)
 
 	fmt.Println("* [24/25] Processing System Requirements!")
-	outputFile.WriteString("\n\n==System requirements==\n")
+	outputFile.WriteString("\n\n==System requirements==")
 
 	outputFile.WriteString(game.OutputSpecs())
 
