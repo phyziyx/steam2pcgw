@@ -161,7 +161,7 @@ func main() {
 	outputFile.WriteString(game.OutputGenres())
 	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            |")
 	outputFile.WriteString(game.OutputThemes())
-	outputFile.WriteString("}}\n{{Infobox game/row/taxonomy/series            | ")
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/series            | ")
 	if len(game.Data.Franchise) != 0 {
 		outputFile.WriteString(game.Data.Franchise)
 		outputFile.WriteString(" }}\n")

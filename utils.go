@@ -190,11 +190,11 @@ func isBlacklistedGenre(genre string) bool {
 }
 
 func (game *Game) OutputThemes() string {
-	var output = " "
+	var output = ""
 	age, _ := getInt(game.Data.RequiredAge)
 
 	if age >= 18 {
-		output += "Adult"
+		output += " Adult"
 	}
 
 	return output
