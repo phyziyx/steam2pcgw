@@ -18,7 +18,7 @@ v0.0.74 Release Candidate 4
 ## How To
 
 1. Either visit the Releases page and download the latest build from there.
-2. Clone or download the ZIP (Press 'Code' → 'Download ZIP'), enter the directory and type `go run`.  Do note, you'll require Go (https://go.dev/doc/install) to do this!
+2. Clone or download the ZIP (Press 'Code' → 'Download ZIP'), enter the directory and type `go run`.  Do note, you'll require Go (<https://go.dev/doc/install>) to do this!
 
 ## Contributions
 
