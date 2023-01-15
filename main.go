@@ -224,14 +224,20 @@ func main() {
 	for _, v := range game.Data.PackageGroups {
 		for _, sub := range v.Subs {
 			edition := strings.ReplaceAll(sub.OptionText, game.Data.Name, "")
+			// fmt.Printf("0. %s\n", edition)
 			edition = strings.TrimSpace(edition)
+			// fmt.Printf("1. %s\n", edition)
 			edition = strings.TrimPrefix(edition, ": ")
-			edition = trimPrice.ReplaceAllLiteralString(edition, "")
+			// fmt.Printf("2. %s\n", edition)
 			edition = strings.TrimPrefix(edition, "- ")
+			// fmt.Printf("3. %s\n", edition)
+			edition = trimPrice.ReplaceAllLiteralString(edition, "")
+			// fmt.Printf("4. %s\n", edition)
 			edition = strings.TrimSpace(edition)
+			// fmt.Printf("5. %s\n", edition)
 
 			if len(edition) != 0 {
-				editions = append(editions, edition)
+				editions = append(editions, "'''"+edition+"'''")
 			}
 		}
 	}

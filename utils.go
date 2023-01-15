@@ -62,6 +62,12 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 		if len(franchiseName) > 1 {
 			result.SetFranchise(franchiseName[1])
 		}
+
+		// TODO
+		// appTags := regexp.MustCompile(`<a href=".+" class="app_tag" style=".+">\s+([A-Za-z \-]+)\s+<\/a>{1,}`).FindAllStringSubmatch(string(scrapeData), 50)
+		// for _, v := range appTags {
+		// 	fmt.Printf("tag: %v\n", v[1])
+		// }
 	}
 
 	return
@@ -123,10 +129,30 @@ func fetchGame(gameId string) (err error) {
 		return
 	}
 
+	// TODO
+	// optionalResponse, optionalErr := makeRequest(fmt.Sprintf("https://cdn.cloudflare.steamstatic.com/steam/apps/%s/library_600x900_2x.jpg", gameId))
+	// if optionalErr = checkRequest(response, optionalErr); optionalErr == nil {
+	// 	defer optionalResponse.Body.Close()
+	// 	scrapeBody, _ = parseResponseToBody(optionalResponse)
+	// 	file, optionalErr := os.Create(gameId + ".jpg")
+	// 	if optionalErr == nil {
+	// 		defer file.Close()
+	// 		_, optionalErr = io.Copy(file, optionalResponse.Body)
+	// 		if optionalErr == nil {
+	// 			fmt.Println("Downloaded game cover!")
+	// 		}
+	// 	}
+	// }
+	// if optionalErr != nil {
+	// 	fmt.Println("Game cover download failed")
+	// }
+
 	optionalResponse, optionalErr := makeRequest(fmt.Sprintf("https://store.steampowered.com/app/%s/%s", gameId, LOCALE))
 	if optionalErr = checkRequest(response, optionalErr); optionalErr == nil {
 		defer optionalResponse.Body.Close()
 		scrapeBody, _ = parseResponseToBody(optionalResponse)
+	} else {
+		fmt.Println("Failed to scrape Steam Store page...")
 	}
 
 	err = createCache(gameId, apiBody, scrapeBody)

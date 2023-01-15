@@ -29,7 +29,15 @@ type Data struct {
 	Genres              []Genre        `json:"genres"`
 	ReleaseDate         ReleaseDate    `json:"release_date"`
 	SupportInfo         SupportInfo    `json:"support_info"`
-	Franchise           string         `json:"-"` // Scraped from Steam Store
+	Franchise           string         `json:"-"` // Scraped from Steam Store (Series on PCGW)
+	// TODO
+	Pacing       []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Perspectives []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Controls     []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Sports       []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Vehicles     []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	ArtStyles    []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Themes       []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
 }
 
 type PackageGroup struct {
