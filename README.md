@@ -71,7 +71,7 @@ v0.0.74 Release Candidate 4
 - [x] Introduction: Introduction
 - [x] Introduction: Release History (Generic)
 - [x] Introduction: Current State (EMPTY)
-- [x] Availability: Steam
+- [x] Availability: Steam (Game editions are automatically added)
 - [ ] Availability: Other Stores (Outside the scope of the project)
 - [ ] Monetization: Ad-Supported
 - [ ] Monetization: DLC
