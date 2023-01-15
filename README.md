@@ -6,14 +6,14 @@ The goal of this tool is to simplify the process of creating new articles for th
 
 Well, it's certainly up to you to decide whether you want to use it or not, and no one will force you to use it, but there are good reasons why you should, even if for certain templates:
 
-- Games with massive DLCs, such as ETS2/ATS/Cities Skylines to name a few.
+- Games with massive DLCs, such as The Sims/Euro Truck Simulator 2/American Truck Simulator/Cities Skylines to name a few.
 - Parses most system requirements FLAWLESSLY!
 - Fills in most of the information available from the API which you may copy-paste and modify as you go!
 - Makes it harder to not skip something while filling in the information.
 
 ## Version
 
-v0.0.73
+v0.0.74 Release Candidate 4
 
 ## How To
 
@@ -28,10 +28,10 @@ v0.0.73
 ## Plans
 
 - [x] Convert into a CLI app
-- [ ] Clean-up the code
+- [ ] Clean-up the code (underway)
 - [ ] Ability to pass in more than one app ID at a time/ parsing more than one article in one go
 - [ ] Add support for other APIs to make the data output more complete
-- [ ] Save cache in a sub-folder, fetch new data if cache is older than seven days (partially done)
+- [x] Save cache in a sub-folder, fetch new data if cache is older than seven days (partially done)
 - [ ] IGDB and OpenCritic support
 - [ ] Download game covers
 
@@ -51,15 +51,15 @@ v0.0.73
 - [ ] Infobox: Taxonomy: Pacing
 - [ ] Infobox: Taxonomy: Perspectives
 - [ ] Infobox: Taxonomy: Controls
-- [x] Infobox: Taxonomy: Genres (and removes invalid genres)
+- [x] Infobox: Taxonomy: Genres (and removes genres not valid for PCGW)
 - [ ] Infobox: Taxonomy: Sports
 - [ ] Infobox: Taxonomy: Vehicles
 - [ ] Infobox: Taxonomy: Art Styles
 - [x] Infobox: Taxonomy: Themes (detects Adult only)
-- [ ] Infobox: Taxonomy: Series
+- [x] Infobox: Taxonomy: Series (detected)
 - [x] Infobox: Steam App ID
 - [ ] Infobox: GOG App ID
-- [x] Infobox: Official Website (or Support Website, whichever is available)
+- [x] Infobox: Official Website (or Support Website as a fallback)
 - [ ] Infobox: HLTB
 - [ ] Infobox: IGDB (Only needs to be set if there is no IGDB reception row, Empty by default for now)
 - [ ] Infobox: Lutris
@@ -92,7 +92,7 @@ v0.0.73
 - [ ] Input: Controller (PS/Xbox/Others) (IMPOSSIBLE)
 - [ ] Audio
 - [x] Languages (There maybe some discrepancies as Steam API provides very vague info - No discrepancies reported so far)
-- [ ] API (App executable bits detected, needs manual review)
+- [ ] API (App executables are guessed from the system specifications - mostly accurate)
 - [ ] Middleware
 - [x] System Requirements: Windows (CPU and GPU sections may need review)
 - [x] System Requirements: Mac (CPU and GPU sections may need review)
@@ -106,3 +106,4 @@ v0.0.73
 - Dave247 - vital feedback and testing
 - Mine18 - vital feedback and testing
 - Mrtnptrs - vital feedback and testing
+- mastan - vital feedback and testing

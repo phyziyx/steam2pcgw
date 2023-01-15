@@ -1,15 +1,13 @@
 package main
 
-type Game map[string]GameValue
-
-type GameValue struct {
+type Game struct {
 	Success bool `json:"success"`
 	Data    Data `json:"data"`
 }
 
 type Data struct {
 	Name                string      `json:"name"`
-	RequiredAge         int         `json:"required_age"`
+	RequiredAge         interface{} `json:"required_age"`
 	IsFree              bool        `json:"is_free"`
 	ControllerSupport   *string     `json:"controller_support,omitempty"`
 	Dlc                 []int64     `json:"dlc,omitempty"`
@@ -30,6 +28,7 @@ type Data struct {
 	Genres              []Genre     `json:"genres"`
 	ReleaseDate         ReleaseDate `json:"release_date"`
 	SupportInfo         SupportInfo `json:"support_info"`
+	Franchise           string      `json:"-"` // Scraped from Steam Store
 }
 
 type Category struct {

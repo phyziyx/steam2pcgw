@@ -14,6 +14,21 @@ import (
 	"time"
 )
 
+func getInt(v interface{}) (int, error) {
+	switch v := v.(type) {
+	case float64:
+		return int(v), nil
+	case string:
+		c, err := strconv.Atoi(v)
+		if err != nil {
+			return 0, err
+		}
+		return c, nil
+	default:
+		return 0, fmt.Errorf("conversion to int from %T not supported", v)
+	}
+}
+
 func (req *Requirement) UnmarshalJSON(data []byte) error {
 	if string(data) == `""` || string(data) == `{}` || string(data) == `[]` {
 		return nil
@@ -23,10 +38,33 @@ func (req *Requirement) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, (*requirement)(req))
 }
 
-func UnmarshalGame(data []byte) (Game, error) {
-	var r Game
-	err := json.Unmarshal(data, &r)
-	return r, err
+func UnmarshalGame(data []byte) (result Game, err error) {
+	var tempResult map[string]Game
+	err = json.Unmarshal(data, &tempResult)
+	if err != nil {
+		return
+	}
+
+	key := make([]string, 0, len(tempResult))
+	for k := range tempResult {
+		key = append(key, k)
+		break
+	}
+
+	result = Game(tempResult[key[0]])
+
+	var scrapeData []byte
+	scrapeData, err = os.ReadFile("cache/" + key[0] + ".html")
+	if err != nil {
+		fmt.Printf("Failed to read scraped Steam page data")
+	} else {
+		franchiseName := regexp.MustCompile(`<div class="dev_row">\s*<b>Franchise:</b>\s*<a href=".*">([^<]+)</a>\s*</div>`).FindStringSubmatch(string(scrapeData))
+		if len(franchiseName) > 1 {
+			result.SetFranchise(franchiseName[1])
+		}
+	}
+
+	return
 }
 
 func makeRequest(url string) (*http.Response, error) {
@@ -44,13 +82,69 @@ func doesCacheExistOrLatest(fileName string) bool {
 	return err == nil && time.Since(fi.ModTime()).Hours() < (7*24)
 }
 
-func createCache(fileName string, data []byte) error {
-	return os.WriteFile(fileName, data, 0777)
+func createCache(gameId string, apiBody []byte, scrapeBody []byte) (err error) {
+	err = os.WriteFile("cache/"+gameId+".json", apiBody, 0777)
+	if len(scrapeBody) != 0 {
+		os.WriteFile("cache/"+gameId+".html", scrapeBody, 0777)
+	}
+	return
+}
+
+func checkRequest(response *http.Response, err error) error {
+	if err != nil {
+		fmt.Printf("Failed to connect to the '%v'... (error: %s)\n", response.Request.URL, err)
+	} else if response.StatusCode != http.StatusOK {
+		fmt.Printf("Failed to connect to the '%v'... (HTTP code: %d)\n", response.Request.URL, response.StatusCode)
+	}
+
+	return err
+}
+
+func parseResponseToBody(response *http.Response) (body []byte, err error) {
+	body, err = io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println("An error occurred while attempting to parse the response body...")
+	}
+	return
+}
+
+func fetchGame(gameId string) (err error) {
+	var response *http.Response
+	var apiBody []byte
+	var scrapeBody []byte
+
+	response, err = makeRequest(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
+	if err = checkRequest(response, err); err != nil {
+		return
+	}
+	defer response.Body.Close()
+	apiBody, err = parseResponseToBody(response)
+	if err != nil {
+		return
+	}
+
+	optionalResponse, optionalErr := makeRequest(fmt.Sprintf("https://store.steampowered.com/app/%s/%s", gameId, LOCALE))
+	if optionalErr = checkRequest(response, optionalErr); optionalErr == nil {
+		defer optionalResponse.Body.Close()
+		scrapeBody, _ = parseResponseToBody(optionalResponse)
+	}
+
+	err = createCache(gameId, apiBody, scrapeBody)
+	if err != nil {
+		fmt.Println("Failed to create the cache, but continuing the process...")
+	} else {
+		fmt.Println("Cached!")
+	}
+
+	return err
 }
 
 func ParseGame(gameId string) (body []byte, err error) {
 
-	fileName := fmt.Sprintf("%s.json", gameId)
+	os.Mkdir("cache", 0777)
+	os.Mkdir("output", 0777)
+
+	fileName := fmt.Sprintf("cache/%s.json", gameId)
 
 	if doesCacheExistOrLatest(fileName) {
 		fmt.Println("Found cache...")
@@ -60,31 +154,9 @@ func ParseGame(gameId string) (body []byte, err error) {
 
 	fmt.Println("Did not find game cache or cache is older than 7 days...")
 
-	var response *http.Response
-	response, err = makeRequest(fmt.Sprintf("%s%s%s", API_LINK, gameId, LOCALE))
-
-	if err != nil {
-		fmt.Printf("Failed to connect to the Steam API... (error: %s)\n", err)
-		return
-	}
-
-	if response.StatusCode != http.StatusOK {
-		fmt.Printf("Failed to connect to the Steam API... (HTTP code: %d)\n", response.StatusCode)
-		return
-	}
-	defer response.Body.Close()
-
-	body, err = io.ReadAll(response.Body)
-	if err != nil {
-		fmt.Println("An error occurred while attempting to parse the response body...")
-		return
-	}
-
-	err = createCache(fileName, body)
-	if err != nil {
-		fmt.Println("Failed to create the cache, but continuing the process...")
-	} else {
-		fmt.Println("Cached!")
+	err = fetchGame(gameId)
+	if err == nil {
+		body, err = os.ReadFile(fileName)
 	}
 
 	return body, err
@@ -117,20 +189,21 @@ func isBlacklistedGenre(genre string) bool {
 	return false
 }
 
-func OutputThemes(game GameValue) string {
-	var output = ""
+func (game *Game) OutputThemes() string {
+	var output = " "
+	age, _ := getInt(game.Data.RequiredAge)
 
-	if game.Data.RequiredAge >= 18 {
+	if age >= 18 {
 		output += "Adult"
 	}
 
 	return output
 }
 
-func OutputGenres(genres []Genre) string {
+func (game *Game) OutputGenres() string {
 	var output = ""
 
-	for _, v := range genres {
+	for _, v := range game.Data.Genres {
 		if isBlacklistedGenre(v.Description) {
 			continue
 		}
@@ -158,6 +231,8 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 			} else {
 				value = "true"
 			}
+		} else if strings.Contains(sanitised, "32/64") {
+			value = "true"
 		} else {
 			ramFinder := regexp.MustCompile(`memory:(\d+) gb`)
 			ramFound := ramFinder.FindStringSubmatch(sanitised)
@@ -182,7 +257,7 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 		}
 	}
 
-	fmt.Printf("* [21/24] %s (32-bit: %v): %s\n", platform, is32, value)
+	fmt.Printf("* [21/25] %s (32-bit: %v): %s\n", platform, is32, value)
 
 	return value
 }
@@ -194,12 +269,12 @@ func removeTags(input string) string {
 	return output
 }
 
-func FindDirectX(pcRequirements Requirement) string {
-	if len(pcRequirements["minimum"].(string)) == 0 {
+func (game *Game) FindDirectX() string {
+	if len(game.Data.PCRequirements["minimum"].(string)) == 0 {
 		return ""
 	}
 
-	sanitised := removeTags(pcRequirements["minimum"].(string))
+	sanitised := removeTags(game.Data.PCRequirements["minimum"].(string))
 	dxRegex := regexp.MustCompile(`DirectX:(.+)\n`)
 	version := dxRegex.FindStringSubmatch(sanitised)
 	if len(version) == 2 {
@@ -271,7 +346,7 @@ func ProcessSpecs(input string, isMin bool) string {
 			gpuRegEx3 := regexp.MustCompile(`(Graphics:)([a-zA-Z0-9.;' -]{1,})(, |/| / )([a-zA-Z0-9.;' -]{1,})(, |/| / )([a-zA-Z0-9.;' -]{1,})`)
 			gpus = gpuRegEx3.FindStringSubmatch(output)
 			if len(gpus) == 7 {
-				output = gpuRegEx3.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU     = %s\n|%sGPU2    = %s\n|%sGPU3    = %s", level, gpus[2], level, gpus[4], level, gpus[6]))
+				output = gpuRegEx3.ReplaceAllLiteralString(output, fmt.Sprintf("|%sGPU   = %s\n|%sGPU2  = %s\n|%sGPU3  = %s", level, gpus[2], level, gpus[4], level, gpus[6]))
 			} else {
 				gpuRegEx2 := regexp.MustCompile(`(Graphics:)(.+)(?: or |/|,|\|)+(.+)\n`)
 				gpus := gpuRegEx2.FindStringSubmatch(output)
@@ -307,19 +382,19 @@ func emptySpecs(level string) string {
 |%sVRAM  = `, level, level, level, level, level, level, level, level)
 }
 
-func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequirements Requirement) string {
+func (game *Game) OutputSpecs() string {
 	var output string = ""
 	var specs string = ""
 
-	if platforms.Windows {
+	if game.Data.Platforms.Windows {
 		output += "\n{{System requirements\n"
 		output += "|OSfamily = Windows"
-		specs = ProcessSpecs(pcRequirements["minimum"].(string), true)
+		specs = ProcessSpecs(game.Data.PCRequirements["minimum"].(string), true)
 		output += specs
 
 		// Handle recommended specs
-		if pcRequirements["recommended"] != nil {
-			specs = ProcessSpecs(pcRequirements["recommended"].(string), false)
+		if game.Data.PCRequirements["recommended"] != nil {
+			specs = ProcessSpecs(game.Data.PCRequirements["recommended"].(string), false)
 			output += specs
 		} else {
 			output += emptySpecs("rec")
@@ -327,15 +402,15 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		output += "\n}}\n"
 	}
 
-	if platforms.MAC {
+	if game.Data.Platforms.MAC {
 		output += "\n{{System requirements\n"
 		output += ("|OSfamily = OS X")
-		specs = ProcessSpecs(macRequirements["minimum"].(string), true)
+		specs = ProcessSpecs(game.Data.MACRequirements["minimum"].(string), true)
 		output += specs
 
 		// Handle recommended specs
-		if macRequirements["recommended"] != nil {
-			specs = ProcessSpecs(macRequirements["recommended"].(string), false)
+		if game.Data.MACRequirements["recommended"] != nil {
+			specs = ProcessSpecs(game.Data.MACRequirements["recommended"].(string), false)
 			output += specs
 		} else {
 			output += emptySpecs("rec")
@@ -343,15 +418,15 @@ func OutputSpecs(platforms Platforms, pcRequirements, macRequirements, linuxRequ
 		output += "\n}}\n"
 	}
 
-	if platforms.Linux {
+	if game.Data.Platforms.Linux {
 		output += "\n{{System requirements\n"
 		output += ("|OSfamily = Linux")
-		specs = ProcessSpecs(linuxRequirements["minimum"].(string), true)
+		specs = ProcessSpecs(game.Data.LinuxRequirements["minimum"].(string), true)
 		output += specs
 
 		// Handle recommended specs
-		if linuxRequirements["recommended"] != nil {
-			specs = ProcessSpecs(linuxRequirements["recommended"].(string), false)
+		if game.Data.LinuxRequirements["recommended"] != nil {
+			specs = ProcessSpecs(game.Data.LinuxRequirements["recommended"].(string), false)
 			output += specs
 		} else {
 			output += emptySpecs("rec")
@@ -451,59 +526,25 @@ func SanitiseName(name string, title bool) string {
 	return name
 }
 
-func HasInAppPurchases(Categories []Category) bool {
-	for _, v := range Categories {
-		if v.ID == 35 {
+func (game *Game) HasCategory(category CategoryId) bool {
+	for _, v := range game.Data.Categories {
+		if CategoryId(v.ID) == category {
 			return true
 		}
 	}
 	return false
 }
 
-func HasFullControllerSupport(Categories []Category) bool {
-	for _, v := range Categories {
-		if v.ID == 28 {
+func (game *Game) HasGenre(genre GenreId) bool {
+	for _, v := range game.Data.Genres {
+		id, _ := strconv.Atoi(v.ID)
+		if GenreId(id) == genre {
 			return true
 		}
 	}
 	return false
 }
 
-func HasMultiplayerSupport(Categories []Category) bool {
-	for _, v := range Categories {
-		if v.ID == 1 {
-			return true
-		}
-	}
-
-	return false
-}
-
-func HasSinglePlayerSupport(Categories []Category) bool {
-	for _, v := range Categories {
-		if v.ID == 2 {
-			return true
-		}
-	}
-
-	return false
-}
-
-func IsEarlyAccess(genres []Genre) bool {
-	for _, v := range genres {
-		if v.Description == "Early Access" {
-			return true
-		}
-	}
-	return false
-}
-
-func HasSteamCloud(Categories []Category) bool {
-	for _, v := range Categories {
-		if v.ID == 23 {
-			return true
-		}
-	}
-
-	return false
+func (game *Game) SetFranchise(name string) {
+	game.Data.Franchise = name
 }

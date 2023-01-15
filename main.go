@@ -45,36 +45,36 @@ func main() {
 		return
 	}
 
-	if !game[gameId].Success {
+	if !game.Success {
 		fmt.Println("The app ID provided does not exist on the Steam database...")
 		return
 	}
 
-	outputFile, err := os.Create(fmt.Sprintf("%s.txt", gameId))
+	outputFile, err := os.Create(fmt.Sprintf("output/%s.txt", gameId))
 	if err != nil {
 		fmt.Println("Failed to create the output file... Process stopped!")
 		return
 	}
 	defer outputFile.Close()
 
-	fmt.Println("* [1/24] Adding stub")
+	fmt.Println("* [1/25] Adding stub")
 	outputFile.WriteString("{{stub}}\n")
 
-	fmt.Println("* [2/24] Adding app cover")
-	outputFile.WriteString(fmt.Sprintf("{{Infobox game\n|cover        = %s cover.jpg", SanitiseName(game[gameId].Data.Name, true)))
+	fmt.Println("* [2/25] Adding app cover")
+	outputFile.WriteString(fmt.Sprintf("{{Infobox game\n|cover        = %s cover.jpg", SanitiseName(game.Data.Name, true)))
 
-	fmt.Println("* [3/24] Adding app developers")
+	fmt.Println("* [3/25] Adding app developers")
 	outputFile.WriteString("\n|developers   = ")
-	for _, developer := range game[gameId].Data.Developers {
+	for _, developer := range game.Data.Developers {
 		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/developer|%s}}", SanitiseName(developer, false)))
 	}
 
-	fmt.Println("* [4/24] Adding app publishers")
+	fmt.Println("* [4/25] Adding app publishers")
 	outputFile.WriteString("\n|publishers   = ")
-	for _, publisher := range game[gameId].Data.Publishers {
-		if len(game[gameId].Data.Publishers) == 1 {
+	for _, publisher := range game.Data.Publishers {
+		if len(game.Data.Publishers) == 1 {
 			skip := false
-			for _, developer := range game[gameId].Data.Developers {
+			for _, developer := range game.Data.Developers {
 				if developer == publisher {
 					skip = true
 					break
@@ -87,68 +87,69 @@ func main() {
 		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/publisher|%s}}", SanitiseName(publisher, false)))
 	}
 
-	fmt.Println("* [5/24] Adding app release date")
-	outputFile.WriteString("\n|engines      =\n{{Infobox game/row/engine|}}\n|release dates= \n")
+	fmt.Println("* [5/25] Adding app release date")
+	outputFile.WriteString("\n|engines      =\n<!-- {{Infobox game/row/engine|}} -->\n|release dates= ")
 
 	var date string = ""
-	if IsEarlyAccess(game[gameId].Data.Genres) {
+	if game.HasGenre(EarlyAccess) {
 		date += "EA"
-	} else if game[gameId].Data.ReleaseDate.ComingSoon {
-		if success, _ := IsDate(game[gameId].Data.ReleaseDate.Date); success {
-			date += ParseDate(game[gameId].Data.ReleaseDate.Date)
+	} else if game.Data.ReleaseDate.ComingSoon {
+		if success, _ := IsDate(game.Data.ReleaseDate.Date); success {
+			date += ParseDate(game.Data.ReleaseDate.Date)
 		} else {
 			date += "TBA"
 		}
 	} else {
-		date += ParseDate(game[gameId].Data.ReleaseDate.Date)
+		date += ParseDate(game.Data.ReleaseDate.Date)
 	}
 
-	if game[gameId].Data.Platforms.Windows {
-		outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date|Windows| %s }}\n", date))
+	if game.Data.Platforms.Windows {
+		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/date|Windows| %s }}", date))
 	}
 
-	if game[gameId].Data.Platforms.MAC {
-		outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date|OS X| %s }}\n", date))
+	if game.Data.Platforms.MAC {
+		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/date|OS X| %s }}", date))
 	}
 
-	if game[gameId].Data.Platforms.Linux {
-		outputFile.WriteString(fmt.Sprintf("{{Infobox game/row/date|Linux| %s }}\n", date))
+	if game.Data.Platforms.Linux {
+		outputFile.WriteString(fmt.Sprintf("\n{{Infobox game/row/date|Linux| %s }}", date))
 	}
 
-	fmt.Println("* [6/24] Adding reception score")
-	if game[gameId].Data.Metacritic != nil {
-		fmt.Println("* [6/24] Added Metacritic")
-		outputFile.WriteString(fmt.Sprintf("\n|reception    = \n{{Infobox game/row/reception|Metacritic|%s|%d}}", game[gameId].Data.Metacritic.URL, game[gameId].Data.Metacritic.Score))
+	fmt.Println("* [6/25] Adding reception score")
+	outputFile.WriteString("|reception    = \n{{Infobox game/row/reception|Metacritic|")
+	if game.Data.Metacritic != nil {
+		fmt.Println("* [6/25] Added Metacritic")
+		outputFile.WriteString(fmt.Sprintf("%s|%d}}", game.Data.Metacritic.URL, game.Data.Metacritic.Score))
 	} else {
-		fmt.Println("* [6/24] Skipped Metacritic")
-		outputFile.WriteString(("\n|reception    = \n{{Infobox game/row/reception|Metacritic|link|rating}}"))
+		fmt.Println("* [6/25] Skipped Metacritic")
+		outputFile.WriteString("link|rating}}")
 	}
 
 	outputFile.WriteString(("\n{{Infobox game/row/reception|OpenCritic|link|rating}}\n{{Infobox game/row/reception|IGDB|link|rating}}"))
 
 	outputFile.WriteString("\n|taxonomy     =\n{{Infobox game/row/taxonomy/monetization      | ")
-	if game[gameId].Data.IsFree {
-		fmt.Println("* [7/24] Game is F2P")
+	if game.Data.IsFree {
+		fmt.Println("* [7/25] Game is F2P")
 		outputFile.WriteString(("Free-to-play }}"))
 	} else {
-		fmt.Println("* [7/24] Game is not F2P")
+		fmt.Println("* [7/25] Game is not F2P")
 		outputFile.WriteString(("One-time game purchase }}"))
 	}
 
-	fmt.Println("* [8/24] Taxonomy...")
+	fmt.Println("* [8/25] Taxonomy...")
 	outputFile.WriteString("\n{{Infobox game/row/taxonomy/microtransactions | ")
-	if !HasInAppPurchases(game[gameId].Data.Categories) {
-		outputFile.WriteString("None")
+	if !game.HasCategory(InAppPurchases) {
+		outputFile.WriteString("None ")
 	}
-	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/modes             | ")
+	outputFile.WriteString("}}\n{{Infobox game/row/taxonomy/modes             | ")
 
 	modes := ""
 
-	if HasSinglePlayerSupport(game[gameId].Data.Categories) {
+	if game.HasCategory(Singleplayer) {
 		modes += "Singleplayer, "
 	}
 
-	if HasMultiplayerSupport(game[gameId].Data.Categories) {
+	if game.HasCategory(Multiplayer) {
 		modes += "Multiplayer, "
 	}
 
@@ -156,15 +157,21 @@ func main() {
 	outputFile.WriteString(modes)
 
 	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/pacing            | }}\n{{Infobox game/row/taxonomy/perspectives      | }}\n{{Infobox game/row/taxonomy/controls          | }}\n{{Infobox game/row/taxonomy/genres            | ")
-	outputFile.WriteString(OutputGenres(game[gameId].Data.Genres))
-	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            | ")
-	outputFile.WriteString(OutputThemes(game[gameId]))
-	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/series            | }}\n")
+	outputFile.WriteString(game.OutputGenres())
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            |")
+	outputFile.WriteString(game.OutputThemes())
+	outputFile.WriteString("}}\n{{Infobox game/row/taxonomy/series            | ")
+	if len(game.Data.Franchise) != 0 {
+		outputFile.WriteString(game.Data.Franchise)
+		outputFile.WriteString(" }}\n")
+	} else {
+		outputFile.WriteString("}}\n")
+	}
 
 	outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = \n", gameId))
-	if game[gameId].Data.Dlc != nil {
+	if game.Data.Dlc != nil {
 		var dlcs string = ""
-		for _, v := range game[gameId].Data.Dlc {
+		for _, v := range game.Data.Dlc {
 			dlcs += fmt.Sprintf("%v, ", v)
 		}
 		dlcs = strings.TrimSuffix(dlcs, ", ")
@@ -173,16 +180,16 @@ func main() {
 	}
 	outputFile.WriteString("|gogcom id    = \n|gogcom id side = \n|official site= ")
 
-	if game[gameId].Data.Website != nil {
-		outputFile.WriteString(*game[gameId].Data.Website)
+	if game.Data.Website != nil {
+		outputFile.WriteString(*game.Data.Website)
 	} else {
-		outputFile.WriteString(game[gameId].Data.SupportInfo.URL)
+		outputFile.WriteString(game.Data.SupportInfo.URL)
 	}
 	outputFile.WriteString("\n|hltb         = \n|igdb         = <!-- Only needs to be set if there is no IGDB reception row -->\n|lutris       = \n|mobygames    = \n|strategywiki = \n|wikipedia    = \n|winehq       = \n|license      = commercial\n}}")
 
-	fmt.Println("* [9/24] Processing introduction...")
+	fmt.Println("* [9/25] Processing introduction...")
 	outputFile.WriteString("\n\n{{Introduction\n|introduction      = ")
-	// outputFile.WriteString(removeTags(game[gameId].Data.AboutTheGame))
+	// outputFile.WriteString(removeTags(game.Data.AboutTheGame))
 
 	outputFile.WriteString("\n\n|release history   = ")
 
@@ -192,30 +199,35 @@ func main() {
 	outputFile.WriteString("\n\n'''General information'''")
 	outputFile.WriteString("\n{{mm}} [https://steamcommunity.com/app/" + gameId + "/discussions/ Steam Community Discussions]")
 
-	fmt.Println("* [10/24] Processing Availability!")
+	fmt.Println("* [10/25] Processing Availability!")
 
 	outputFile.WriteString("\n\n==Availability==\n{{Availability|\n")
 
 	platforms := ""
 
-	if game[gameId].Data.Platforms.Windows {
+	if game.Data.Platforms.Windows {
 		platforms += "Windows, "
 	}
-	if game[gameId].Data.Platforms.MAC {
+	if game.Data.Platforms.MAC {
 		platforms += "OS X, "
 	}
-	if game[gameId].Data.Platforms.Linux {
+	if game.Data.Platforms.Linux {
 		platforms += "Linux, "
 	}
 
 	platforms = strings.TrimSuffix(platforms, ", ")
 
-	outputFile.WriteString(fmt.Sprintf("{{Availability/row| Steam | %s | Steam |  |  | %s }}", gameId, platforms))
-	outputFile.WriteString("\n}}")
+	outputFile.WriteString(fmt.Sprintf("{{Availability/row| Steam | %s | Steam |  | Steam | %s ", gameId, platforms))
+
+	if len(game.Data.Packages) == 0 {
+		outputFile.WriteString("| unavailable ")
+	}
+
+	outputFile.WriteString("}}\n}}")
 
 	outputFile.WriteString("\n\n<!-- PAGE GENERATED BY STEAM2PCGW -->\n")
 
-	fmt.Println("* [11/24] Processing Monetization!")
+	fmt.Println("* [11/25] Processing Monetization!")
 	outputFile.WriteString("\n\n==Monetization==\n")
 
 	outputFile.WriteString("{{Monetization")
@@ -224,18 +236,19 @@ func main() {
 	outputFile.WriteString("\n|expansion pack         = ")
 	outputFile.WriteString("\n|freeware               = ")
 	outputFile.WriteString("\n|free-to-play           = ")
-	if game[gameId].Data.IsFree {
+	if game.Data.IsFree {
 		outputFile.WriteString("The game has such monetization.")
 	}
 	outputFile.WriteString("\n|one-time game purchase = ")
-	if !game[gameId].Data.IsFree {
+	if !game.Data.IsFree {
 		outputFile.WriteString("The game requires an upfront purchase to access.")
 	}
 	outputFile.WriteString("\n|sponsored              = ")
 	outputFile.WriteString("\n|subscription           = ")
+	outputFile.WriteString("\n|subscription gaming service = ")
 	outputFile.WriteString("\n}}")
 
-	fmt.Println("* [12/24] Processing Microtransactions!")
+	fmt.Println("* [12/25] Processing Microtransactions!")
 
 	outputFile.WriteString("\n\n===Microtransactions===\n{{Microtransactions")
 
@@ -247,7 +260,7 @@ func main() {
 	outputFile.WriteString("\n|free-to-grind       = ")
 	outputFile.WriteString("\n|loot box            = ")
 	outputFile.WriteString("\n|none                = ")
-	if !HasInAppPurchases(game[gameId].Data.Categories) {
+	if !game.HasCategory(InAppPurchases) {
 		outputFile.WriteString("None")
 	}
 	outputFile.WriteString("\n|player trading      = ")
@@ -255,40 +268,40 @@ func main() {
 	outputFile.WriteString("\n|unlock              = ")
 	outputFile.WriteString("\n}}")
 
-	fmt.Println("* [13/24] Processing DLCs!")
+	fmt.Println("* [13/25] Processing DLCs!")
 	outputFile.WriteString("\n\n{{DLC|\n<!-- DLC rows goes below: -->\n}}")
 
-	fmt.Println("* [14/24] Processing Config File Location!")
+	fmt.Println("* [14/25] Processing Config File Location!")
 
 	outputFile.WriteString("\n\n==Game data==\n===Configuration file(s) location===")
 	outputFile.WriteString("\n{{Game data|")
-	if game[gameId].Data.Platforms.Windows {
+	if game.Data.Platforms.Windows {
 		outputFile.WriteString("\n{{Game data/config|Windows|}}")
 	}
-	if game[gameId].Data.Platforms.MAC {
+	if game.Data.Platforms.MAC {
 		outputFile.WriteString("\n{{Game data/config|OS X|}}")
 	}
-	if game[gameId].Data.Platforms.Linux {
+	if game.Data.Platforms.Linux {
 		outputFile.WriteString("\n{{Game data/config|Linux|}}")
 	}
 	outputFile.WriteString("\n}}")
 
-	fmt.Println("* [15/24] Processing Save Game Location!")
+	fmt.Println("* [15/25] Processing Save Game Location!")
 
 	outputFile.WriteString("\n\n===Save game data location===")
 	outputFile.WriteString("\n{{Game data|")
-	if game[gameId].Data.Platforms.Windows {
+	if game.Data.Platforms.Windows {
 		outputFile.WriteString("\n{{Game data/saves|Windows|}}")
 	}
-	if game[gameId].Data.Platforms.MAC {
+	if game.Data.Platforms.MAC {
 		outputFile.WriteString("\n{{Game data/saves|OS X|}}")
 	}
-	if game[gameId].Data.Platforms.Linux {
+	if game.Data.Platforms.Linux {
 		outputFile.WriteString("\n{{Game data/saves|Linux|}}")
 	}
 	outputFile.WriteString("\n}}")
 
-	fmt.Println("* [16/24] Processing Save Game Sync!")
+	fmt.Println("* [16/25] Processing Save Game Sync!")
 
 	outputFile.WriteString("\n\n===[[Glossary:Save game cloud syncing|Save game cloud syncing]]===\n{{Save game cloud syncing\n")
 	outputFile.WriteString(`|discord                   = 
@@ -304,10 +317,10 @@ func main() {
 	// Game has steam cloud, then we can just add it
 	// Otherwise, we can check if the game is out yet or not
 	// to determine whether we should add `unknown` or `false`
-	if HasSteamCloud(game[gameId].Data.Categories) {
+	if game.HasCategory(SteamCloud) {
 		outputFile.WriteString("true")
 	} else {
-		if game[gameId].Data.ReleaseDate.ComingSoon {
+		if game.Data.ReleaseDate.ComingSoon {
 			outputFile.WriteString("unknown")
 		} else {
 			outputFile.WriteString("false")
@@ -323,7 +336,7 @@ func main() {
 }}`)
 
 	// TODO: Scan the description to search for widescreen, ray tracing etc support
-	fmt.Println("* [17/24] Processing Video!")
+	fmt.Println("* [17/25] Processing Video!")
 	outputFile.WriteString("\n\n==Video==\n{{Video\n")
 	outputFile.WriteString(`|wsgf link                  = 
 |widescreen wsgf award      = 
@@ -365,12 +378,12 @@ func main() {
 |color blind notes          = 
 }}`)
 
-	fmt.Println("* [18/24] Processing Input!")
+	fmt.Println("* [18/25] Processing Input!")
 
 	outputFile.WriteString("\n\n==Input==\n{{Input")
 
 	controller := false
-	if game[gameId].Data.ControllerSupport != nil {
+	if game.Data.ControllerSupport != nil {
 		controller = true
 	}
 
@@ -389,7 +402,7 @@ func main() {
 |touchscreen notes         = `)
 
 	outputFile.WriteString(fmt.Sprintf("\n|controller support        = %v\n|controller support notes  = \n|full controller           = ", controller))
-	if controller && *game[gameId].Data.ControllerSupport == "full" {
+	if controller && *game.Data.ControllerSupport == "full" {
 		outputFile.WriteString("true")
 	} else {
 		outputFile.WriteString("false")
@@ -443,7 +456,7 @@ func main() {
 |steam cursor detection notes = 
 }}`)
 
-	fmt.Println("* [19/24] Processing Audio!")
+	fmt.Println("* [19/25] Processing Audio!")
 
 	outputFile.WriteString("\n\n")
 	outputFile.WriteString(`==Audio==
@@ -468,8 +481,8 @@ func main() {
 |general midi audio notes  = 
 }}`)
 
-	fmt.Println("* [20/24] Processing Languages!")
-	languages := ProcessLanguages(game[gameId].Data.SupportedLanguages)
+	fmt.Println("* [20/25] Processing Languages!")
+	languages := ProcessLanguages(game.Data.SupportedLanguages)
 
 	outputFile.WriteString("\n\n{{L10n|content=")
 
@@ -507,10 +520,69 @@ func main() {
 
 	outputFile.WriteString("\n}}\n")
 
-	fmt.Println("* [21/24] Processing API!")
+	fmt.Println("* [21/25] Processing Network!")
+
+	if game.HasCategory(Multiplayer) {
+		outputFile.WriteString("\n\n==Network==")
+		outputFile.WriteString("\n{{Network/Multiplayer")
+		outputFile.WriteString("\n|local play           = ")
+		if game.HasCategory(LocalMultiPlayer) || game.HasCategory(LocalCoOp) {
+			outputFile.WriteString("true")
+		} else {
+			outputFile.WriteString("false")
+		}
+		outputFile.WriteString(`
+|local play players   = 
+|local play modes     = 
+|local play notes     = `)
+
+		outputFile.WriteString("\n|lan play             = ")
+		if game.HasCategory(CoOp) {
+			outputFile.WriteString("true")
+		} else {
+			outputFile.WriteString("false")
+		}
+		outputFile.WriteString(`
+|lan play players     = 
+|lan play modes       = 
+|lan play notes       = `)
+
+		outputFile.WriteString("\n|online play          = ")
+		if game.HasCategory(OnlineMultiPlayer) || game.HasCategory(OnlineCoOp) {
+			outputFile.WriteString("true")
+		} else {
+			outputFile.WriteString("false")
+		}
+		outputFile.WriteString(`
+|online play players  = 
+|online play modes    = 
+|online play notes    = 
+|asynchronous         = 
+|asynchronous notes   = 
+}}`)
+		outputFile.WriteString("\n{{Network/Connections")
+		outputFile.WriteString(`
+|matchmaking        = 
+|matchmaking notes  = 
+|p2p                = 
+|p2p notes          = 
+|dedicated          = 
+|dedicated notes    = 
+|self-hosting       = 
+|self-hosting notes = 
+|direct ip          = 
+|direct ip notes    = 
+}}{{Network/Ports
+|tcp  = 
+|udp  = 
+|upnp = 
+}}`)
+	}
+
+	fmt.Println("* [22/25] Processing API!")
 
 	outputFile.WriteString("\n\n==Other information==\n===API===\n{{API\n")
-	outputFile.WriteString(fmt.Sprintf("|direct3d versions      = %s\n", FindDirectX(game[gameId].Data.PCRequirements)))
+	outputFile.WriteString(fmt.Sprintf("|direct3d versions      = %s\n", game.FindDirectX()))
 	outputFile.WriteString(fmt.Sprintf(`|direct3d notes         = 
 |directdraw versions    = 
 |directdraw notes       = 
@@ -545,11 +617,11 @@ func main() {
 |linux arm app          = false
 |linux executable notes = 
 }}`,
-		GetExeBit(true, "windows", game[gameId].Data.Platforms, game[gameId].Data.PCRequirements), GetExeBit(false, "windows", game[gameId].Data.Platforms, game[gameId].Data.PCRequirements),
-		GetExeBit(true, "mac", game[gameId].Data.Platforms, game[gameId].Data.MACRequirements), GetExeBit(false, "mac", game[gameId].Data.Platforms, game[gameId].Data.MACRequirements),
-		GetExeBit(true, "linux", game[gameId].Data.Platforms, game[gameId].Data.LinuxRequirements), GetExeBit(false, "linux", game[gameId].Data.Platforms, game[gameId].Data.LinuxRequirements)))
+		GetExeBit(true, "windows", game.Data.Platforms, game.Data.PCRequirements), GetExeBit(false, "windows", game.Data.Platforms, game.Data.PCRequirements),
+		GetExeBit(true, "mac", game.Data.Platforms, game.Data.MACRequirements), GetExeBit(false, "mac", game.Data.Platforms, game.Data.MACRequirements),
+		GetExeBit(true, "linux", game.Data.Platforms, game.Data.LinuxRequirements), GetExeBit(false, "linux", game.Data.Platforms, game.Data.LinuxRequirements)))
 
-	fmt.Println("* [22/24] Processing Middleware!")
+	fmt.Println("* [23/25] Processing Middleware!")
 
 	outputFile.WriteString("\n\n===Middleware===\n{{Middleware")
 	outputFile.WriteString(`
@@ -569,33 +641,13 @@ func main() {
 |anticheat notes  = 
 }}`)
 
-	if HasMultiplayerSupport(game[gameId].Data.Categories) {
-		outputFile.WriteString("\n\n===Network===\n{{Network/Multiplayer")
-		outputFile.WriteString(`
-|local play           = 
-|local play players   = 
-|local play modes     = 
-|local play notes     = 
-|lan play             = 
-|lan play players     = 
-|lan play modes       = 
-|lan play notes       = 
-|online play          = 
-|online play players  = 
-|online play modes    = 
-|online play notes    = 
-|asynchronous         = 
-|asynchronous notes   = 
-}}`)
-	}
-
-	fmt.Println("* [23/24] Processing System Requirements!")
+	fmt.Println("* [24/25] Processing System Requirements!")
 	outputFile.WriteString("\n\n==System requirements==\n")
 
-	outputFile.WriteString(OutputSpecs(game[gameId].Data.Platforms, game[gameId].Data.PCRequirements, game[gameId].Data.MACRequirements, game[gameId].Data.LinuxRequirements))
+	outputFile.WriteString(game.OutputSpecs())
 
-	fmt.Println("* [24/24] Processing References!")
+	fmt.Println("* [25/25] Processing References!")
 	outputFile.WriteString("\n{{References}}")
 
-	println(fmt.Sprintf("Successfully parsed information for game: '%s'", SanitiseName(game[gameId].Data.Name, true)))
+	println(fmt.Sprintf("Successfully parsed information for game: '%s'", SanitiseName(game.Data.Name, true)))
 }
