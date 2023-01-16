@@ -555,6 +555,9 @@ func FormatLanguage(language string, languages Language) string {
 
 func SanitiseName(name string, title bool) string {
 	name = strings.ReplaceAll(name, "™", "")
+	name = strings.ReplaceAll(name, "®", "")
+	name = strings.ReplaceAll(name, "©", "")
+
 	if !title {
 		// game titles can have LLC
 		name = strings.ReplaceAll(name, " LLC", "")
