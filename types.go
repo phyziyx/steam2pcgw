@@ -6,29 +6,30 @@ type Game struct {
 }
 
 type Data struct {
-	Name                string         `json:"name"`
-	RequiredAge         interface{}    `json:"required_age"` // Either an integer or a string
-	IsFree              bool           `json:"is_free"`
-	ControllerSupport   *string        `json:"controller_support,omitempty"`
-	Dlc                 []int64        `json:"dlc,omitempty"`
-	DetailedDescription string         `json:"detailed_description"`
-	AboutTheGame        string         `json:"about_the_game"`
-	ShortDescription    string         `json:"short_description"`
-	SupportedLanguages  string         `json:"supported_languages"`
-	Website             *string        `json:"website"`
-	PCRequirements      Requirement    `json:"pc_requirements,omitempty"`
-	MACRequirements     Requirement    `json:"mac_requirements,omitempty"`
-	LinuxRequirements   Requirement    `json:"linux_requirements,omitempty"`
-	Developers          []string       `json:"developers"`
-	Publishers          []string       `json:"publishers"`
-	Packages            []int64        `json:"packages"`
-	PackageGroups       []PackageGroup `json:"package_groups"`
-	Platforms           Platforms      `json:"platforms"`
-	Metacritic          *Metacritic    `json:"metacritic,omitempty"`
-	Categories          []Category     `json:"categories"`
-	ReleaseDate         ReleaseDate    `json:"release_date"`
-	SupportInfo         SupportInfo    `json:"support_info"`
-	SteamGenres         []SteamGenre   `json:"genres"`
+	Name                  string         `json:"name"`
+	RequiredAge           interface{}    `json:"required_age"` // Either an integer or a string
+	IsFree                bool           `json:"is_free"`
+	ControllerSupport     *string        `json:"controller_support,omitempty"`
+	Dlc                   []int64        `json:"dlc,omitempty"`
+	DetailedDescription   string         `json:"detailed_description"`
+	AboutTheGame          string         `json:"about_the_game"`
+	ShortDescription      string         `json:"short_description"`
+	SupportedLanguages    string         `json:"supported_languages"`
+	Website               *string        `json:"website"`
+	PCRequirements        Requirement    `json:"pc_requirements,omitempty"`
+	MACRequirements       Requirement    `json:"mac_requirements,omitempty"`
+	LinuxRequirements     Requirement    `json:"linux_requirements,omitempty"`
+	Developers            []string       `json:"developers"`
+	Publishers            []string       `json:"publishers"`
+	Packages              []int64        `json:"packages"`
+	PackageGroups         []PackageGroup `json:"package_groups"`
+	Platforms             Platforms      `json:"platforms"`
+	Metacritic            *Metacritic    `json:"metacritic,omitempty"`
+	Categories            []Category     `json:"categories"`
+	ReleaseDate           ReleaseDate    `json:"release_date"`
+	SupportInfo           SupportInfo    `json:"support_info"`
+	SteamGenres           []SteamGenre   `json:"genres"`
+	ExternalAccountNotice string         `json:"ext_user_account_notice,omitempty"`
 
 	Genres       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
 	Franchise    string `json:"-"` // Scraped from Steam Store (Series on PCGW)
