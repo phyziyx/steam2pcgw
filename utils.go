@@ -59,9 +59,12 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 	if err != nil {
 		fmt.Printf("Failed to read scraped Steam page data")
 	} else {
-		franchiseName := regexp.MustCompile(`<div class="dev_row">\s*<b>Franchise:</b>\s*<a href=".*">([^<]+)</a>\s*</div>`).FindStringSubmatch(string(scrapeData))
-		if len(franchiseName) > 1 {
-			result.SetFranchise(franchiseName[1])
+		franchiseNames := regexp.MustCompile(`<div class="dev_row">\s*<b>Franchise:</b>\s*<a href=".*">([^<]+)</a>\s*</div>`).FindStringSubmatch(string(scrapeData))
+		if len(franchiseNames) > 1 {
+			franchiseName := removeTags(html.UnescapeString(franchiseNames[0]), "")
+			franchiseName = strings.ReplaceAll(franchiseName, "Franchise:", "")
+			franchiseName = strings.TrimSpace(franchiseName)
+			result.SetFranchise(franchiseName)
 		}
 
 		dirtyTags := regexp.MustCompile(`<a href=".+" class="app_tag" style=".+">\s+(.+)\s+<\/a>{1,}`).FindAllStringSubmatch(string(scrapeData), 50)
@@ -258,7 +261,7 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 		(platform == "linux" && !platforms.Linux) {
 	} else {
 		var sanitised = strings.ToLower(requirements["minimum"].(string))
-		sanitised = removeTags(sanitised)
+		sanitised = removeTags(sanitised, "\n")
 
 		if strings.Contains(sanitised, "Requires a 64-bit processor and operating system") {
 			if is32 {
@@ -297,9 +300,9 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 	return value
 }
 
-func removeTags(input string) string {
+func removeTags(input string, replacement string) string {
 	noTag, _ := regexp.Compile(`(<[^>]*>)+`)
-	output := noTag.ReplaceAllLiteralString(input, "\n")
+	output := noTag.ReplaceAllLiteralString(input, replacement)
 	output = strings.ReplaceAll(output, "\n ", "")
 	return output
 }
@@ -309,7 +312,7 @@ func (game *Game) FindDirectX() string {
 		return ""
 	}
 
-	sanitised := removeTags(game.Data.PCRequirements["minimum"].(string))
+	sanitised := removeTags(game.Data.PCRequirements["minimum"].(string), "\n")
 	dxRegex := regexp.MustCompile(`DirectX:(.+)\n`)
 	version := dxRegex.FindStringSubmatch(sanitised)
 	if len(version) == 2 {
@@ -329,7 +332,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	}
 
 	// Sanitise input and remove HTML tags
-	output = removeTags(output)
+	output = removeTags(output, "\n")
 
 	// Cleanup some text, more texts must be added here...
 	output = strings.Replace(output, "Requires a 64-bit processor and operating system", "", 1)
@@ -742,7 +745,7 @@ func (game *Game) SetGenres(tags []string) {
 		"Word"}
 	for _, genre := range genres {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(genre), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(genre)) {
 				output += genre + ", "
 				break
 			}
@@ -859,14 +862,18 @@ func (game *Game) SetArtStyles(tags []string) {
 		"Voxel art"}
 	for _, artStyle := range artStyles {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(artStyle), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(artStyle)) {
 				output += artStyle + ", "
 				break
 			}
 		}
 	}
-	output = strings.TrimSuffix(output, ", ")
-	output = strings.TrimSpace(output)
+	if len(output) == 0 {
+		output = "Realistic"
+	} else {
+		output = strings.TrimSuffix(output, ", ")
+		output = strings.TrimSpace(output)
+	}
 	game.Data.ArtStyles = output
 }
 
