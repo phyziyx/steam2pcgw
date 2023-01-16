@@ -7,7 +7,7 @@ type Game struct {
 
 type Data struct {
 	Name                string         `json:"name"`
-	RequiredAge         interface{}    `json:"required_age"`
+	RequiredAge         interface{}    `json:"required_age"` // Either an integer or a string
 	IsFree              bool           `json:"is_free"`
 	ControllerSupport   *string        `json:"controller_support,omitempty"`
 	Dlc                 []int64        `json:"dlc,omitempty"`
@@ -26,29 +26,30 @@ type Data struct {
 	Platforms           Platforms      `json:"platforms"`
 	Metacritic          *Metacritic    `json:"metacritic,omitempty"`
 	Categories          []Category     `json:"categories"`
-	Genres              []Genre        `json:"genres"`
 	ReleaseDate         ReleaseDate    `json:"release_date"`
 	SupportInfo         SupportInfo    `json:"support_info"`
-	Franchise           string         `json:"-"` // Scraped from Steam Store (Series on PCGW)
-	// TODO
-	Pacing       []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Perspectives []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Controls     []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Sports       []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Vehicles     []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	ArtStyles    []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Themes       []string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	SteamGenres         []SteamGenre   `json:"genres"`
+
+	Genres       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Franchise    string `json:"-"` // Scraped from Steam Store (Series on PCGW)
+	Pacing       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Perspectives string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Controls     string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Sports       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Vehicles     string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	ArtStyles    string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Themes       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
 }
 
 type PackageGroup struct {
-	Name                    string `json:"name"`
-	Title                   string `json:"title"`
-	Description             string `json:"description"`
-	SelectionText           string `json:"selection_text"`
-	SaveText                string `json:"save_text"`
-	DisplayType             int64  `json:"display_type"`
-	IsRecurringSubscription string `json:"is_recurring_subscription"`
-	Subs                    []Sub  `json:"subs"`
+	Name                    string      `json:"name"`
+	Title                   string      `json:"title"`
+	Description             string      `json:"description"`
+	SelectionText           string      `json:"selection_text"`
+	SaveText                string      `json:"save_text"`
+	DisplayType             interface{} `json:"display_type"`
+	IsRecurringSubscription string      `json:"is_recurring_subscription"`
+	Subs                    []Sub       `json:"subs"`
 }
 
 type Sub struct {
@@ -67,7 +68,7 @@ type Category struct {
 	Description string `json:"description"`
 }
 
-type Genre struct {
+type SteamGenre struct {
 	ID          string `json:"id"`
 	Description string `json:"description"`
 }

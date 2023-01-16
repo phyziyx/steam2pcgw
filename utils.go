@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
 	"os"
@@ -14,7 +15,7 @@ import (
 	"time"
 )
 
-func getInt(v interface{}) (int, error) {
+func GetInt(v interface{}) (int, error) {
 	switch v := v.(type) {
 	case float64:
 		return int(v), nil
@@ -63,18 +64,36 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 			result.SetFranchise(franchiseName[1])
 		}
 
-		// TODO
-		// appTags := regexp.MustCompile(`<a href=".+" class="app_tag" style=".+">\s+([A-Za-z \-]+)\s+<\/a>{1,}`).FindAllStringSubmatch(string(scrapeData), 50)
-		// for _, v := range appTags {
-		// 	fmt.Printf("tag: %v\n", v[1])
-		// }
+		dirtyTags := regexp.MustCompile(`<a href=".+" class="app_tag" style=".+">\s+(.+)\s+<\/a>{1,}`).FindAllStringSubmatch(string(scrapeData), 50)
+		var appTags []string
+		for _, tag := range dirtyTags {
+			cleanTag := html.UnescapeString(tag[1])
+			cleanTag = strings.Replace(cleanTag, "+", "", 1)
+			cleanTag = strings.Replace(cleanTag, "&", "", 1)
+			cleanTag = strings.TrimSpace(cleanTag)
+
+			appTags = append(appTags, cleanTag)
+		}
+
+		result.SetPacing(appTags)
+		result.SetPerspective(appTags)
+		result.SetControls(appTags)
+		result.SetGenres(appTags)
+		result.SetSports(appTags)
+		result.SetVehicles(appTags)
+		result.SetArtStyles(appTags)
+		result.SetThemes(appTags)
 	}
 
 	return
 }
 
 func makeRequest(url string) (*http.Response, error) {
-	resp, err := http.Get(url)
+	client := &http.Client{}
+	getData := strings.NewReader("")
+	req, _ := http.NewRequest("GET", url, getData)
+	req.Header.Set("Cookie", "birthtime=0; max-age=315360000;")
+	resp, err := client.Do(req)
 
 	if err != nil {
 		return nil, err
@@ -101,6 +120,7 @@ func checkRequest(response *http.Response, err error) error {
 		fmt.Printf("Failed to connect to the '%v'... (error: %s)\n", response.Request.URL, err)
 	} else if response.StatusCode != http.StatusOK {
 		fmt.Printf("Failed to connect to the '%v'... (HTTP code: %d)\n", response.Request.URL, response.StatusCode)
+		err = errors.New("status code not OK")
 	}
 
 	return err
@@ -204,42 +224,31 @@ func TakeInput() (string, error) {
 	return text, nil
 }
 
-func isBlacklistedGenre(genre string) bool {
-	blacklisted := []string{"Early Access", "Indie", "Casual"}
-	for _, listedGenre := range blacklisted {
-		if genre == listedGenre {
-			return true
-		}
-	}
+// func isBlacklistedGenre(genre string) bool {
+// 	blacklisted := []string{"Early Access", "Indie", "Casual"}
+// 	for _, listedGenre := range blacklisted {
+// 		if genre == listedGenre {
+// 			return true
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
-func (game *Game) OutputThemes() string {
-	var output = ""
-	age, _ := getInt(game.Data.RequiredAge)
+// func (game *Game) OutputGenres() string {
+// 	var output = ""
 
-	if age >= 18 {
-		output += " Adult"
-	}
+// 	for _, v := range game.Data.Genres {
+// 		if isBlacklistedGenre(v.Description) {
+// 			continue
+// 		}
 
-	return output
-}
+// 		output += v.Description + ", "
+// 	}
+// 	output = strings.TrimSuffix(output, ", ")
 
-func (game *Game) OutputGenres() string {
-	var output = ""
-
-	for _, v := range game.Data.Genres {
-		if isBlacklistedGenre(v.Description) {
-			continue
-		}
-
-		output += v.Description + ", "
-	}
-	output = strings.TrimSuffix(output, ", ")
-
-	return output
-}
+// 	return output
+// }
 
 func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Requirement) string {
 	value := "unknown"
@@ -562,8 +571,8 @@ func (game *Game) HasCategory(category CategoryId) bool {
 	return false
 }
 
-func (game *Game) HasGenre(genre GenreId) bool {
-	for _, v := range game.Data.Genres {
+func (game *Game) HasSteamGenre(genre GenreId) bool {
+	for _, v := range game.Data.SteamGenres {
 		id, _ := strconv.Atoi(v.ID)
 		if GenreId(id) == genre {
 			return true
@@ -574,4 +583,347 @@ func (game *Game) HasGenre(genre GenreId) bool {
 
 func (game *Game) SetFranchise(name string) {
 	game.Data.Franchise = name
+}
+
+func (game *Game) SetPacing(tags []string) {
+	var output string
+	pacing := []string{
+		"Continuous turn-based",
+		"Persistent",
+		"Real-time",
+		"Relaxed",
+		"Turn-based"}
+	for _, pace := range pacing {
+		for _, tag := range tags {
+			if strings.Contains(pace, tag) {
+				output += pace + ", "
+				break
+			}
+		}
+	}
+	if len(output) == 0 {
+		output += "Real-time, "
+	}
+	output = strings.TrimSuffix(output, ", ")
+	output = strings.TrimSpace(output)
+	game.Data.Pacing = output
+}
+
+func (game *Game) SetPerspective(tags []string) {
+	var output string
+	perspectives := []string{
+		"Audio-based",
+		"Bird's-eye view",
+		"Cinematic camera",
+		"First-person",
+		"Flip screen",
+		"Free-roaming camera",
+		"Isometric",
+		"Scrolling",
+		"Side view",
+		"Text-based",
+		"Third-person",
+		"Top-down view"}
+	for _, perspective := range perspectives {
+		for _, tag := range tags {
+			if strings.Contains(perspective, tag) {
+				output += perspective + ", "
+				break
+			}
+		}
+	}
+	output = strings.TrimSuffix(output, ", ")
+	output = strings.TrimSpace(output)
+	game.Data.Perspectives = output
+}
+
+func (game *Game) SetControls(tags []string) {
+	var output string
+	controls := []string{
+		"Direct control",
+		"Gestures",
+		"Menu-based",
+		"Multiple select",
+		"Point and select",
+		"Text input",
+		"Voice control"}
+	for _, control := range controls {
+		for _, tag := range tags {
+			if strings.Contains(control, tag) {
+				output += control + ", "
+				break
+			}
+		}
+	}
+	output = strings.TrimSuffix(output, ", ")
+	output = strings.TrimSpace(output)
+	game.Data.Controls = output
+}
+
+func (game *Game) SetGenres(tags []string) {
+	var output string
+	genres := []string{
+		"4X",
+		"Action",
+		"Adventure",
+		"Arcade",
+		"ARPG",
+		"Artillery",
+		"Battle royale",
+		"Board",
+		"Brawler",
+		"Building",
+		"Business",
+		"Card/tile",
+		"CCG",
+		"Chess",
+		"Clicker",
+		"Dating",
+		"Driving",
+		"Educational",
+		"Endless runner",
+		"Exploration",
+		"Falling block",
+		"Fighting",
+		"FPS",
+		"Gambling/casino",
+		"Hack and slash",
+		"Hidden object",
+		"Hunting",
+		"Idle",
+		"Immersive sim",
+		"Interactive book",
+		"JRPG",
+		"Life sim",
+		"Mental training",
+		"Metroidvania",
+		"Mini-games",
+		"MMO",
+		"MMORPG",
+		"Music/rhythm",
+		"Open world",
+		"Paddle",
+		"Party game",
+		"Pinball",
+		"Platform",
+		"Puzzle",
+		"Quick time events",
+		"Racing",
+		"Rail shooter",
+		"Roguelike",
+		"Rolling ball",
+		"RPG",
+		"RTS",
+		"Sandbox",
+		"Shooter",
+		"Simulation",
+		"Sports",
+		"Stealth",
+		"Strategy",
+		"Survival",
+		"Survival horror",
+		"Tactical RPG",
+		"Tactical shooter",
+		"TBS",
+		"Text adventure",
+		"Tile matching",
+		"Time management",
+		"Tower defense",
+		"TPS",
+		"Tricks",
+		"Trivia/quiz",
+		"Vehicle combat",
+		"Vehicle simulator",
+		"Visual novel",
+		"Wargame",
+		"Word"}
+	for _, genre := range genres {
+		for _, tag := range tags {
+			if strings.Contains(genre, tag) {
+				output += genre + ", "
+				break
+			}
+		}
+	}
+	output = strings.TrimSuffix(output, ", ")
+	output = strings.TrimSpace(output)
+	game.Data.Genres = output
+}
+
+func (game *Game) SetSports(tags []string) {
+	var output string
+	sports := []string{
+		"American football",
+		"Australian football",
+		"Baseball",
+		"Basketball",
+		"Bowling",
+		"Boxing",
+		"Cricket",
+		"Darts/tarSet shooting",
+		"Dodgeball",
+		"Extreme sports",
+		"Fictional sport",
+		"Fishing",
+		"Football (Soccer)",
+		"Golf",
+		"Handball",
+		"Hockey",
+		"Horse",
+		"Lacrosse",
+		"Martial arts",
+		"Mixed sports",
+		"Paintball",
+		"Parachuting",
+		"Pool or snooker",
+		"Racquetball/squash",
+		"Rugby",
+		"Sailing/boating",
+		"Skateboarding",
+		"Skating",
+		"Snowboarding or skiing",
+		"Surfing",
+		"Table tennis",
+		"Tennis",
+		"Volleyball",
+		"Water sports",
+		"Wrestling"}
+	for _, sport := range sports {
+		for _, tag := range tags {
+			if strings.Contains(sport, tag) {
+				output += sport + ", "
+				break
+			}
+		}
+	}
+	output = strings.TrimSuffix(output, ", ")
+	output = strings.TrimSpace(output)
+	game.Data.Sports = output
+}
+
+func (game *Game) SetVehicles(tags []string) {
+	var output string
+	vehicles := []string{
+		"Automobile",
+		"Bicycle",
+		"Bus",
+		"Flight",
+		"Helicopter",
+		"Hovercraft",
+		"Industrial",
+		"Motorcycle",
+		"Naval/watercraft",
+		"Off-roading",
+		"Robot",
+		"Self-propelled artillery",
+		"Space flight",
+		"Street racing",
+		"Tank",
+		"Track racing",
+		"Train",
+		"Transport",
+		"Truck"}
+	for _, vehicle := range vehicles {
+		for _, tag := range tags {
+			if strings.Contains(vehicle, tag) {
+				output += vehicle + ", "
+				break
+			}
+		}
+	}
+	output = strings.TrimSuffix(output, ", ")
+	output = strings.TrimSpace(output)
+	game.Data.Vehicles = output
+}
+
+func (game *Game) SetArtStyles(tags []string) {
+	var output string
+	artStyles := []string{
+		"Abstract",
+		"Anime",
+		"Cartoon",
+		"Cel-shaded",
+		"Comic book",
+		"Digitized",
+		"FMV",
+		"Live action",
+		"Pixel art",
+		"Pre-rendered graphics",
+		"Realistic",
+		"Stylized",
+		"Vector art",
+		"Video backdrop",
+		"Voxel art"}
+	for _, artStyle := range artStyles {
+		for _, tag := range tags {
+			if strings.Contains(artStyle, tag) {
+				output += artStyle + ", "
+				break
+			}
+		}
+	}
+	output = strings.TrimSuffix(output, ", ")
+	output = strings.TrimSpace(output)
+	game.Data.ArtStyles = output
+}
+
+func (game *Game) SetThemes(tags []string) {
+	var output string
+	themes := []string{
+		"Adult",
+		"Africa",
+		"Amusement park",
+		"Antarctica",
+		"Arctic",
+		"Asia",
+		"China",
+		"Classical",
+		"Cold War",
+		"Comedy",
+		"Contemporary",
+		"Cyberpunk",
+		"Dark",
+		"Detective/mystery",
+		"Eastern Europe",
+		"Egypt",
+		"Europe",
+		"Fantasy",
+		"Healthcare",
+		"Historical",
+		"Horror",
+		"Industrial Age",
+		"Interwar",
+		"Japan",
+		"LGBTQ",
+		"Lovecraftian",
+		"Medieval",
+		"Middle East",
+		"North America",
+		"Oceania",
+		"Piracy",
+		"Post-apocalyptic",
+		"Pre-Columbian Americas",
+		"Prehistoric",
+		"Renaissance",
+		"Romance",
+		"Sci-fi",
+		"South America",
+		"Space",
+		"Steampunk",
+		"Supernatural",
+		"Victorian",
+		"Western",
+		"World War I",
+		"World War II",
+		"Zombies"}
+	for _, theme := range themes {
+		for _, tag := range tags {
+			if strings.Contains(theme, tag) {
+				output += theme + ", "
+				break
+			}
+		}
+	}
+	output = strings.TrimSuffix(output, ", ")
+	game.Data.Themes = output
 }

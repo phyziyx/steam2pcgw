@@ -92,7 +92,7 @@ func main() {
 	outputFile.WriteString("\n|engines      =\n<!-- {{Infobox game/row/engine|}} -->\n|release dates= ")
 
 	var date string = ""
-	if game.HasGenre(EarlyAccess) {
+	if game.HasSteamGenre(EarlyAccess) {
 		date += "EA"
 	} else if game.Data.ReleaseDate.ComingSoon {
 		if success, _ := IsDate(game.Data.ReleaseDate.Date); success {
@@ -157,10 +157,30 @@ func main() {
 	modes = strings.TrimSuffix(modes, ", ")
 	outputFile.WriteString(modes)
 
-	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/pacing            | }}\n{{Infobox game/row/taxonomy/perspectives      | }}\n{{Infobox game/row/taxonomy/controls          | }}\n{{Infobox game/row/taxonomy/genres            | ")
-	outputFile.WriteString(game.OutputGenres())
-	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | }}\n{{Infobox game/row/taxonomy/vehicles          | }}\n{{Infobox game/row/taxonomy/art styles        | }}\n{{Infobox game/row/taxonomy/themes            |")
-	outputFile.WriteString(game.OutputThemes())
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/pacing            | ")
+	outputFile.WriteString(game.Data.Pacing)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/perspectives      | ")
+	outputFile.WriteString(game.Data.Perspectives)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/controls          | ")
+	outputFile.WriteString(game.Data.Controls)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/genres            | ")
+	outputFile.WriteString(game.Data.Genres)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/sports            | ")
+	outputFile.WriteString(game.Data.Sports)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/vehicles          | ")
+	outputFile.WriteString(game.Data.Vehicles)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/art styles        | ")
+	outputFile.WriteString(game.Data.ArtStyles)
+
+	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/themes            | ")
+	outputFile.WriteString(game.Data.Themes)
+
 	outputFile.WriteString(" }}\n{{Infobox game/row/taxonomy/series            | ")
 	if len(game.Data.Franchise) != 0 {
 		outputFile.WriteString(game.Data.Franchise)
@@ -222,6 +242,11 @@ func main() {
 	trimPrice := regexp.MustCompile("- (.+)")
 
 	for _, v := range game.Data.PackageGroups {
+		diplayType, _ := GetInt(v.DisplayType)
+		if diplayType == 1 {
+			continue
+		}
+
 		for _, sub := range v.Subs {
 			edition := strings.ReplaceAll(sub.OptionText, game.Data.Name, "")
 			// fmt.Printf("0. %s\n", edition)
@@ -265,7 +290,7 @@ func main() {
 
 	outputFile.WriteString("}}\n}}")
 
-	if len(game.Data.Packages) > 1 {
+	if len(editionList) > 1 {
 		outputFile.WriteString("\n\n===Version differences===\n{{ii}} ")
 		outputFile.WriteString(editionList)
 	}
