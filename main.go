@@ -239,7 +239,7 @@ func main() {
 	platforms = strings.TrimSuffix(platforms, ", ")
 
 	var editions []string
-	trimPrice := regexp.MustCompile("- (.+)")
+	trimPrice := regexp.MustCompile(`(\$.+ USD)`)
 
 	for _, v := range game.Data.PackageGroups {
 		diplayType, _ := GetInt(v.DisplayType)
