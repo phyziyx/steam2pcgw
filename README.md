@@ -18,7 +18,9 @@ v0.0.74 Release Candidate 5
 ## How To
 
 1. Either visit the Releases page and download the latest build from there.
-2. Clone or download the ZIP (Press 'Code' → 'Download ZIP'), enter the directory and type `go run`.  Do note, you'll require Go (<https://go.dev/doc/install>) to do this!
+2. Download the ZIP (Press 'Code' → 'Download ZIP') or Clone.
+3. Create two directories where the executable is placed: `cache` (stores all the Steam Page and Steam API cache) and `output` (outputs all the generated articles in there).
+4. Run the executable or type `go run` (you'll require Go <https://go.dev/doc/install> to do this!).
 
 ## Contributions
 
@@ -31,7 +33,7 @@ v0.0.74 Release Candidate 5
 - [ ] Clean-up the code (underway)
 - [ ] Ability to pass in more than one app ID at a time/ parsing more than one article in one go
 - [ ] Add support for other APIs to make the data output more complete
-- [x] Save cache in a sub-folder, fetch new data if cache is older than seven days (partially done)
+- [x] Save cache in a sub-folder, fetch new data if cache is older than seven days
 - [ ] IGDB and OpenCritic support
 - [ ] Download game covers
 
@@ -73,6 +75,7 @@ v0.0.74 Release Candidate 5
 - [x] Introduction: Current State (EMPTY)
 - [x] Availability: Steam (Game editions are automatically added)
 - [ ] Availability: Other Stores (Outside the scope of the project)
+- [x] 3rd Party Account Requirements.
 - [ ] Monetization: Ad-Supported
 - [ ] Monetization: DLC
 - [ ] Monetization: Expansion Pack
