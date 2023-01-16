@@ -69,7 +69,7 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 		for _, tag := range dirtyTags {
 			cleanTag := html.UnescapeString(tag[1])
 			cleanTag = strings.Replace(cleanTag, "+", "", 1)
-			cleanTag = strings.Replace(cleanTag, "&", "", 1)
+			cleanTag = strings.Replace(cleanTag, "Point & Click", "Point and Select", 1)
 			cleanTag = strings.TrimSpace(cleanTag)
 
 			appTags = append(appTags, cleanTag)
@@ -595,7 +595,7 @@ func (game *Game) SetPacing(tags []string) {
 		"Turn-based"}
 	for _, pace := range pacing {
 		for _, tag := range tags {
-			if strings.Contains(pace, tag) {
+			if strings.Contains(strings.ToLower(pace), strings.ToLower(tag)) {
 				output += pace + ", "
 				break
 			}
@@ -626,7 +626,7 @@ func (game *Game) SetPerspective(tags []string) {
 		"Top-down view"}
 	for _, perspective := range perspectives {
 		for _, tag := range tags {
-			if strings.Contains(perspective, tag) {
+			if strings.Contains(strings.ToLower(perspective), strings.ToLower(tag)) {
 				output += perspective + ", "
 				break
 			}
@@ -649,7 +649,7 @@ func (game *Game) SetControls(tags []string) {
 		"Voice control"}
 	for _, control := range controls {
 		for _, tag := range tags {
-			if strings.Contains(control, tag) {
+			if strings.Contains(strings.ToLower(control), strings.ToLower(tag)) {
 				output += control + ", "
 				break
 			}
@@ -739,7 +739,7 @@ func (game *Game) SetGenres(tags []string) {
 		"Word"}
 	for _, genre := range genres {
 		for _, tag := range tags {
-			if strings.Contains(genre, tag) {
+			if strings.Contains(strings.ToLower(genre), strings.ToLower(tag)) {
 				output += genre + ", "
 				break
 			}
@@ -790,7 +790,7 @@ func (game *Game) SetSports(tags []string) {
 		"Wrestling"}
 	for _, sport := range sports {
 		for _, tag := range tags {
-			if strings.Contains(sport, tag) {
+			if strings.Contains(strings.ToLower(sport), strings.ToLower(tag)) {
 				output += sport + ", "
 				break
 			}
@@ -825,7 +825,7 @@ func (game *Game) SetVehicles(tags []string) {
 		"Truck"}
 	for _, vehicle := range vehicles {
 		for _, tag := range tags {
-			if strings.Contains(vehicle, tag) {
+			if strings.Contains(strings.ToLower(vehicle), strings.ToLower(tag)) {
 				output += vehicle + ", "
 				break
 			}
@@ -856,7 +856,7 @@ func (game *Game) SetArtStyles(tags []string) {
 		"Voxel art"}
 	for _, artStyle := range artStyles {
 		for _, tag := range tags {
-			if strings.Contains(artStyle, tag) {
+			if strings.Contains(strings.ToLower(artStyle), strings.ToLower(tag)) {
 				output += artStyle + ", "
 				break
 			}
@@ -918,7 +918,7 @@ func (game *Game) SetThemes(tags []string) {
 		"Zombies"}
 	for _, theme := range themes {
 		for _, tag := range tags {
-			if strings.Contains(theme, tag) {
+			if strings.Contains(strings.ToLower(theme), strings.ToLower(tag)) {
 				output += theme + ", "
 				break
 			}

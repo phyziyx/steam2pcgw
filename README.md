@@ -13,7 +13,7 @@ Well, it's certainly up to you to decide whether you want to use it or not, and 
 
 ## Version
 
-v0.0.74 Release Candidate 4
+v0.0.74 Release Candidate 5
 
 ## How To
 
@@ -48,14 +48,14 @@ v0.0.74 Release Candidate 4
 - [x] Infobox: Taxomony: F2P / One-time Game Purchase
 - [ ] Infobox: Taxonomy: Microtransactions
 - [x] Infobox: Taxonomy: Modes (Singleplayer and Multiplayer)
-- [ ] Infobox: Taxonomy: Pacing
-- [ ] Infobox: Taxonomy: Perspectives
-- [ ] Infobox: Taxonomy: Controls
-- [x] Infobox: Taxonomy: Genres (and removes genres not valid for PCGW)
-- [ ] Infobox: Taxonomy: Sports
-- [ ] Infobox: Taxonomy: Vehicles
-- [ ] Infobox: Taxonomy: Art Styles
-- [x] Infobox: Taxonomy: Themes (detects Adult only)
+- [x] Infobox: Taxonomy: Pacing (defaults to Real-time if none found)
+- [x] Infobox: Taxonomy: Perspectives (can be empty)
+- [x] Infobox: Taxonomy: Controls (can be empty)
+- [x] Infobox: Taxonomy: Genres (can be empty)
+- [x] Infobox: Taxonomy: Sports (can be empty)
+- [x] Infobox: Taxonomy: Vehicles (can be empty)
+- [x] Infobox: Taxonomy: Art Styles (can be empty)
+- [x] Infobox: Taxonomy: Themes (can be empty)
 - [x] Infobox: Taxonomy: Series (detected)
 - [x] Infobox: Steam App ID
 - [ ] Infobox: GOG App ID
