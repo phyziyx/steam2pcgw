@@ -248,18 +248,13 @@ func main() {
 		}
 
 		for _, sub := range v.Subs {
-			edition := strings.ReplaceAll(sub.OptionText, game.Data.Name, "")
-			// fmt.Printf("0. %s\n", edition)
+			edition := strings.ReplaceAll(sub.OptionText, SanitiseName(game.Data.Name, true), "")
 			edition = strings.TrimSpace(edition)
-			// fmt.Printf("1. %s\n", edition)
 			edition = strings.TrimPrefix(edition, ": ")
-			// fmt.Printf("2. %s\n", edition)
 			edition = strings.TrimPrefix(edition, "- ")
-			// fmt.Printf("3. %s\n", edition)
 			edition = trimPrice.ReplaceAllLiteralString(edition, "")
-			// fmt.Printf("4. %s\n", edition)
 			edition = strings.TrimSpace(edition)
-			// fmt.Printf("5. %s\n", edition)
+			edition = strings.TrimSuffix(edition, " -")
 
 			if len(edition) != 0 {
 				editions = append(editions, "'''"+edition+"'''")
@@ -290,21 +285,26 @@ func main() {
 
 	outputFile.WriteString("}}\n}}")
 
+	// Third party account check
 	if len(game.Data.ExternalAccountNotice) != 0 {
 		outputFile.WriteString(fmt.Sprintf("\n{{ii}} Requires 3rd-Party Account: %s", game.Data.ExternalAccountNotice))
 	}
 
-	if len(game.Data.DRMNotice) != 0 {
-		var drms string
-		if strings.Contains(game.Data.DRMNotice, "Denuvo") {
-			drms += "{{DRM|Denuvo}}, "
-		}
+	// DRM check
+	var drms string
+	if strings.Contains(game.Data.DRMNotice, "Denuvo") {
+		drms += "{{DRM|Denuvo}}, "
+	}
+	// if strings.Contains(game.Data.PCRequirements["minimum"].(string), "VMProtect") {
+	// 	drms += "{{DRM|VMProtect}}, "
+	// }
 
-		drms = strings.TrimSuffix(drms, ", ")
-		if len(drms) == 0 {
-			drms += game.Data.DRMNotice
+	drms = strings.TrimSuffix(drms, ", ")
+	if len(drms) == 0 {
+		drms += game.Data.DRMNotice
+		if len(drms) != 0 {
+			outputFile.WriteString(fmt.Sprintf("\n{{ii}} All versions require %s.", drms))
 		}
-		outputFile.WriteString(fmt.Sprintf("\n{{ii}} All versions require %s.", drms))
 	}
 
 	if len(editionList) > 1 {

@@ -427,7 +427,7 @@ func (game *Game) OutputSpecs() string {
 
 	if game.Data.Platforms.Windows {
 		output += "\n{{System requirements\n"
-		output += "|OSfamily = Windows"
+		output += "|OSfamily  = Windows"
 		specs = ProcessSpecs(game.Data.PCRequirements["minimum"].(string), true)
 		output += specs
 
@@ -443,7 +443,7 @@ func (game *Game) OutputSpecs() string {
 
 	if game.Data.Platforms.MAC {
 		output += "\n{{System requirements\n"
-		output += ("|OSfamily = OS X")
+		output += ("|OSfamily  = OS X")
 		specs = ProcessSpecs(game.Data.MACRequirements["minimum"].(string), true)
 		output += specs
 
@@ -459,7 +459,7 @@ func (game *Game) OutputSpecs() string {
 
 	if game.Data.Platforms.Linux {
 		output += "\n{{System requirements\n"
-		output += ("|OSfamily = Linux")
+		output += ("|OSfamily  = Linux")
 		specs = ProcessSpecs(game.Data.LinuxRequirements["minimum"].(string), true)
 		output += specs
 

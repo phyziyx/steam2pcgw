@@ -56,7 +56,7 @@ v0.0.74 Release Candidate 5
 - [x] Infobox: Taxonomy: Genres (can be empty)
 - [x] Infobox: Taxonomy: Sports (can be empty)
 - [x] Infobox: Taxonomy: Vehicles (can be empty)
-- [x] Infobox: Taxonomy: Art Styles (can be empty)
+- [x] Infobox: Taxonomy: Art Styles (defaults to Realistic if none found)
 - [x] Infobox: Taxonomy: Themes (can be empty)
 - [x] Infobox: Taxonomy: Series (detected)
 - [x] Infobox: Steam App ID
@@ -75,7 +75,7 @@ v0.0.74 Release Candidate 5
 - [x] Introduction: Current State (EMPTY)
 - [x] Availability: Steam (Game editions are automatically added)
 - [ ] Availability: Other Stores (Outside the scope of the project)
-- [x] 3rd Party Account Requirements.
+- [x] Availability: 3rd Party Account Requirements and DRM Notices (Denuvo only).
 - [ ] Monetization: Ad-Supported
 - [ ] Monetization: DLC
 - [ ] Monetization: Expansion Pack
