@@ -294,6 +294,19 @@ func main() {
 		outputFile.WriteString(fmt.Sprintf("\n{{ii}} Requires 3rd-Party Account: %s", game.Data.ExternalAccountNotice))
 	}
 
+	if len(game.Data.DRMNotice) != 0 {
+		var drms string
+		if strings.Contains(game.Data.DRMNotice, "Denuvo") {
+			drms += "{{DRM|Denuvo}}, "
+		}
+
+		drms = strings.TrimSuffix(drms, ", ")
+		if len(drms) == 0 {
+			drms += game.Data.DRMNotice
+		}
+		outputFile.WriteString(fmt.Sprintf("\n{{ii}} All versions require %s.", drms))
+	}
+
 	if len(editionList) > 1 {
 		outputFile.WriteString("\n\n===Version differences===\n{{ii}} ")
 		outputFile.WriteString(editionList)

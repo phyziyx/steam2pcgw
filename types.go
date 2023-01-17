@@ -30,6 +30,7 @@ type Data struct {
 	SupportInfo           SupportInfo    `json:"support_info"`
 	SteamGenres           []SteamGenre   `json:"genres"`
 	ExternalAccountNotice string         `json:"ext_user_account_notice,omitempty"`
+	DRMNotice             string         `json:"drm_notice,omitempty"`
 
 	Genres       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
 	Franchise    string `json:"-"` // Scraped from Steam Store (Series on PCGW)
