@@ -616,7 +616,7 @@ func (game *Game) SetPacing(tags []string) {
 		"Turn-based"}
 	for _, pace := range pacing {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(pace), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(pace)) {
 				output += pace + ", "
 				break
 			}
@@ -647,7 +647,7 @@ func (game *Game) SetPerspective(tags []string) {
 		"Top-down view"}
 	for _, perspective := range perspectives {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(perspective), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(perspective)) {
 				output += perspective + ", "
 				break
 			}
@@ -670,7 +670,7 @@ func (game *Game) SetControls(tags []string) {
 		"Voice control"}
 	for _, control := range controls {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(control), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(control)) {
 				output += control + ", "
 				break
 			}
@@ -781,7 +781,7 @@ func (game *Game) SetSports(tags []string) {
 		"Bowling",
 		"Boxing",
 		"Cricket",
-		"Darts/tarSet shooting",
+		"Darts/target shooting",
 		"Dodgeball",
 		"Extreme sports",
 		"Fictional sport",
@@ -811,7 +811,7 @@ func (game *Game) SetSports(tags []string) {
 		"Wrestling"}
 	for _, sport := range sports {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(sport), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(sport)) {
 				output += sport + ", "
 				break
 			}
@@ -846,7 +846,7 @@ func (game *Game) SetVehicles(tags []string) {
 		"Truck"}
 	for _, vehicle := range vehicles {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(vehicle), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(vehicle)) {
 				output += vehicle + ", "
 				break
 			}
@@ -943,7 +943,7 @@ func (game *Game) SetThemes(tags []string) {
 		"Zombies"}
 	for _, theme := range themes {
 		for _, tag := range tags {
-			if strings.Contains(strings.ToLower(theme), strings.ToLower(tag)) {
+			if strings.Contains(strings.ToLower(tag), strings.ToLower(theme)) {
 				output += theme + ", "
 				break
 			}
