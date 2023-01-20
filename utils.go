@@ -488,6 +488,11 @@ func ProcessLanguages(input string) Language {
 	for i := 0; i < len(input); i++ {
 
 		// fmt.Printf("[ProcessLanguages] '%c' char found (language: '%s')\n", input[i], language)
+		if language == "Simplified Chinese" {
+			language = "Chinese Simplified"
+		} else if language == "Traditional Chinese" {
+			language = "Chinese Traditional"
+		}
 
 		if rune(input[i]) == '\n' {
 			// New line, new language!
@@ -549,8 +554,18 @@ func ParseDate(date string) (output string) {
 
 func FormatLanguage(language string, languages Language) string {
 	sanitisedLanguage := language
-	sanitisedLanguage = strings.Replace(sanitisedLanguage, "Spanish - Spain", "Spanish", 1)
-	sanitisedLanguage = strings.Replace(sanitisedLanguage, "Spanish - Latin America", "Latin American Spanish", 1)
+
+	if sanitisedLanguage == "Spanish - Spain" {
+		sanitisedLanguage = "Spanish"
+	} else if sanitisedLanguage == "Spanish - Latin America" {
+		sanitisedLanguage = "Latin American Spanish"
+	} else if sanitisedLanguage == "Portuguese - Brazil" {
+		sanitisedLanguage = "Brazilian Portuguese"
+	} else if sanitisedLanguage == "Chinese Simplified" {
+		sanitisedLanguage = "Simplified Chinese"
+	} else if sanitisedLanguage == "Chinese Traditional" {
+		sanitisedLanguage = "Traditional Chinese"
+	}
 
 	return fmt.Sprintf("\n{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = \n}}",
 		sanitisedLanguage, languages[language].UI, languages[language].Audio, languages[language].Subtitles)
