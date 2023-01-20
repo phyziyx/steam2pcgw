@@ -61,7 +61,7 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 	} else {
 		franchiseNames := regexp.MustCompile(`<div class="dev_row">\s*<b>Franchise:</b>\s*<a href=".*">([^<]+)</a>\s*</div>`).FindStringSubmatch(string(scrapeData))
 		if len(franchiseNames) > 1 {
-			franchiseName := removeTags(html.UnescapeString(franchiseNames[0]), "")
+			franchiseName := RemoveTags(html.UnescapeString(franchiseNames[0]), "")
 			franchiseName = strings.ReplaceAll(franchiseName, "Franchise:", "")
 			franchiseName = strings.TrimSpace(franchiseName)
 			result.SetFranchise(franchiseName)
@@ -261,7 +261,7 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 		(platform == "linux" && !platforms.Linux) {
 	} else {
 		var sanitised = strings.ToLower(requirements["minimum"].(string))
-		sanitised = removeTags(sanitised, "\n")
+		sanitised = RemoveTags(sanitised, "\n")
 
 		if strings.Contains(sanitised, "Requires a 64-bit processor and operating system") {
 			if is32 {
@@ -300,7 +300,7 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 	return value
 }
 
-func removeTags(input string, replacement string) string {
+func RemoveTags(input string, replacement string) string {
 	noTag, _ := regexp.Compile(`(<[^>]*>)+`)
 	output := noTag.ReplaceAllLiteralString(input, replacement)
 	output = strings.ReplaceAll(output, "\n ", "")
@@ -312,7 +312,7 @@ func (game *Game) FindDirectX() string {
 		return ""
 	}
 
-	sanitised := removeTags(game.Data.PCRequirements["minimum"].(string), "\n")
+	sanitised := RemoveTags(game.Data.PCRequirements["minimum"].(string), "\n")
 	dxRegex := regexp.MustCompile(`DirectX:(.+)\n`)
 	version := dxRegex.FindStringSubmatch(sanitised)
 	if len(version) == 2 {
@@ -332,7 +332,7 @@ func ProcessSpecs(input string, isMin bool) string {
 	}
 
 	// Sanitise input and remove HTML tags
-	output = removeTags(output, "\n")
+	output = RemoveTags(output, "\n")
 
 	// Cleanup some text, more texts must be added here...
 	output = strings.Replace(output, "Requires a 64-bit processor and operating system", "", 1)

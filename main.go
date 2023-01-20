@@ -248,7 +248,8 @@ func main() {
 		}
 
 		for _, sub := range v.Subs {
-			edition := strings.ReplaceAll(sub.OptionText, SanitiseName(game.Data.Name, true), "")
+			edition := RemoveTags(sub.OptionText, "")
+			edition = strings.ReplaceAll(edition, SanitiseName(game.Data.Name, true), "")
 			edition = strings.TrimSpace(edition)
 			edition = strings.TrimPrefix(edition, ": ")
 			edition = strings.TrimPrefix(edition, "- ")
