@@ -467,7 +467,7 @@ func (game *Game) parseReviews(htmlString string) {
 											continue
 										}
 
-										game.AddRating(h.Data, c.FirstChild.Data, href)
+										game.AddRating(h.Data, g.FirstChild.Data, href)
 									}
 								}
 							}
@@ -476,6 +476,7 @@ func (game *Game) parseReviews(htmlString string) {
 				}
 			}
 		}
+
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			f(c)
 		}
