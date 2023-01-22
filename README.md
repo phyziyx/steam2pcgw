@@ -13,7 +13,7 @@ Well, it's certainly up to you to decide whether you want to use it or not, and 
 
 ## Version
 
-v0.0.74 Release Candidate 5
+v0.0.74 Release Candidate 6
 
 ## How To
 
@@ -29,12 +29,10 @@ v0.0.74 Release Candidate 5
 
 ## Plans
 
-- [x] Convert into a CLI app
+- [ ] Convert into a CLI app
 - [ ] Clean-up the code (underway)
-- [ ] Ability to pass in more than one app ID at a time/ parsing more than one article in one go
-- [ ] Add support for other APIs to make the data output more complete
+- [ ] Utilise other APIs and scrape more data to output a more complete article
 - [x] Save cache in a sub-folder, fetch new data if cache is older than seven days
-- [ ] IGDB and OpenCritic support
 - [ ] Download game covers
 
 ### Article Status
@@ -45,7 +43,7 @@ v0.0.74 Release Candidate 5
 - [x] Infobox: Publishers
 - [x] Infobox: Release Date
 - [x] Infobox: Reception: Metacritic (if available)
-- [ ] Infobox: Reception: OpenCritic (NOT AVAILABLE)
+- [x] Infobox: Reception: OpenCritic (if available on IsThereAnyDeals)
 - [ ] Infobox: Reception: IGDB (NOT AVAILABLE)
 - [x] Infobox: Taxomony: F2P / One-time Game Purchase
 - [ ] Infobox: Taxonomy: Microtransactions
@@ -74,7 +72,7 @@ v0.0.74 Release Candidate 5
 - [x] Introduction: Release History (Generic)
 - [x] Introduction: Current State (EMPTY)
 - [x] Availability: Steam (Game editions are automatically added)
-- [ ] Availability: Other Stores (Outside the scope of the project)
+- [x] Availability: Other Stores (if available on IsThereAnyDeals)
 - [x] Availability: 3rd Party Account Requirements and DRM Notices (Denuvo only).
 - [ ] Monetization: Ad-Supported
 - [ ] Monetization: DLC

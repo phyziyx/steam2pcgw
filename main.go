@@ -119,14 +119,20 @@ func main() {
 	fmt.Println("* [6/25] Adding reception score")
 	outputFile.WriteString("\n|reception    = \n{{Infobox game/row/reception|Metacritic|")
 	if game.Data.Metacritic != nil {
-		fmt.Println("* [6/25] Added Metacritic")
-		outputFile.WriteString(fmt.Sprintf("%s|%d}}", game.Data.Metacritic.URL, game.Data.Metacritic.Score))
+		outputFile.WriteString(fmt.Sprintf("%s|%d}}", strings.TrimPrefix(game.Data.Metacritic.URL, "https://metacritic.com/game/pc/"), game.Data.Metacritic.Score))
+	} else if val, ok := game.Data.Ratings["Metascore"]; ok {
+		outputFile.WriteString(fmt.Sprintf("%s|%d}}", strings.TrimPrefix(val.URL, "https://metacritic.com/game/pc/"), val.Score))
 	} else {
-		fmt.Println("* [6/25] Skipped Metacritic")
 		outputFile.WriteString("link|rating}}")
 	}
 
-	outputFile.WriteString(("\n{{Infobox game/row/reception|OpenCritic|link|rating}}\n{{Infobox game/row/reception|IGDB|link|rating}}"))
+	outputFile.WriteString("\n{{Infobox game/row/reception|OpenCritic|")
+	if val, ok := game.Data.Ratings["OpenCritic"]; ok {
+		outputFile.WriteString(fmt.Sprintf("%s|%d}}", strings.TrimPrefix(val.URL, "https://opencritic.com/game/"), val.Score))
+	} else {
+		outputFile.WriteString("link|rating}}")
+	}
+	outputFile.WriteString("\n{{Infobox game/row/reception|IGDB|link|rating}}")
 
 	outputFile.WriteString("\n|taxonomy     =\n{{Infobox game/row/taxonomy/monetization      | ")
 	if game.Data.IsFree {
@@ -189,7 +195,7 @@ func main() {
 		outputFile.WriteString("}}\n")
 	}
 
-	outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = \n", gameId))
+	outputFile.WriteString(fmt.Sprintf("|steam appid  = %s\n|steam appid side = ", gameId))
 	if game.Data.Dlc != nil {
 		var dlcs string = ""
 		for _, v := range game.Data.Dlc {
@@ -278,13 +284,19 @@ func main() {
 		editionList += " also available"
 	}
 
-	outputFile.WriteString(fmt.Sprintf("{{Availability/row| Steam | %s | Steam | %s | Steam | %s ", gameId, editionList, platforms))
+	outputFile.WriteString(fmt.Sprintf("{{Availability/row| Steam | %s | Steam | %s | | %s ", gameId, editionList, platforms))
 
 	if len(game.Data.Packages) == 0 {
 		outputFile.WriteString("| unavailable ")
 	}
 
-	outputFile.WriteString("}}\n}}")
+	outputFile.WriteString("}}")
+
+	for store, data := range game.Data.Stores {
+		outputFile.WriteString(fmt.Sprintf("\n{{Availability/row| %s | %s | DRM | %s | | %s }}", store, data.URL, editionList, data.Platforms))
+	}
+
+	outputFile.WriteString("\n}}")
 
 	// Third party account check
 	if len(game.Data.ExternalAccountNotice) != 0 {

@@ -24,7 +24,7 @@ type Data struct {
 	Packages              []int64        `json:"packages"`
 	PackageGroups         []PackageGroup `json:"package_groups"`
 	Platforms             Platforms      `json:"platforms"`
-	Metacritic            *Metacritic    `json:"metacritic,omitempty"`
+	Metacritic            *Rating        `json:"metacritic,omitempty"`
 	Categories            []Category     `json:"categories"`
 	ReleaseDate           ReleaseDate    `json:"release_date"`
 	SupportInfo           SupportInfo    `json:"support_info"`
@@ -32,15 +32,17 @@ type Data struct {
 	ExternalAccountNotice string         `json:"ext_user_account_notice,omitempty"`
 	DRMNotice             string         `json:"drm_notice,omitempty"`
 
-	Genres       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Franchise    string `json:"-"` // Scraped from Steam Store (Series on PCGW)
-	Pacing       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Perspectives string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Controls     string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Sports       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Vehicles     string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	ArtStyles    string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Themes       string `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Stores       map[string]Store  `json:"-"` // Scrapped from IsThereAnyDeals
+	Ratings      map[string]Rating `json:"-"` // Scraped from IsThereAnyDeals
+	Genres       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Franchise    string            `json:"-"` // Scraped from Steam Store (Series on PCGW)
+	Pacing       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Perspectives string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Controls     string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Sports       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Vehicles     string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	ArtStyles    string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Themes       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
 }
 
 type PackageGroup struct {
@@ -55,7 +57,7 @@ type PackageGroup struct {
 }
 
 type Sub struct {
-	Packageid                int64  `json:"packageid"`
+	PackageID                int64  `json:"packageid"`
 	PercentSavingsText       string `json:"percent_savings_text"`
 	PercentSavings           int64  `json:"percent_savings"`
 	OptionText               string `json:"option_text"`
@@ -77,8 +79,8 @@ type SteamGenre struct {
 
 type Requirement map[string]interface{}
 
-type Metacritic struct {
-	Score int64  `json:"score"`
+type Rating struct {
+	Score int    `json:"score"`
 	URL   string `json:"url"`
 }
 
@@ -86,10 +88,6 @@ type Platforms struct {
 	Windows bool `json:"windows"`
 	MAC     bool `json:"mac"`
 	Linux   bool `json:"linux"`
-}
-
-type Recommendations struct {
-	Total int64 `json:"total"`
 }
 
 type ReleaseDate struct {
@@ -102,10 +100,15 @@ type SupportInfo struct {
 	Email string `json:"email"`
 }
 
-type Language map[string]LanguageValue
+type Language map[string]LanguageData
 
-type LanguageValue struct {
+type LanguageData struct {
 	UI        bool
 	Audio     bool
 	Subtitles bool
+}
+
+type Store struct {
+	Platforms string
+	URL       string
 }

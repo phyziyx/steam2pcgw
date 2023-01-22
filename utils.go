@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html"
 	"io"
 	"net/http"
 	"os"
@@ -13,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/net/html"
 )
 
 func GetInt(v interface{}) (int, error) {
@@ -46,16 +47,18 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 		return
 	}
 
-	key := make([]string, 0, len(tempResult))
-	for k := range tempResult {
-		key = append(key, k)
+	var gameId string
+	for key := range tempResult {
+		gameId = key
 		break
 	}
 
-	result = Game(tempResult[key[0]])
+	result = Game(tempResult[gameId])
+	result.Data.Ratings = make(map[string]Rating)
+	result.Data.Stores = make(map[string]Store)
 
 	var scrapeData []byte
-	scrapeData, err = os.ReadFile("cache/" + key[0] + ".html")
+	scrapeData, err = os.ReadFile("cache/" + gameId + ".html")
 	if err != nil {
 		fmt.Printf("Failed to read scraped Steam page data")
 	} else {
@@ -86,6 +89,20 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 		result.SetVehicles(appTags)
 		result.SetArtStyles(appTags)
 		result.SetThemes(appTags)
+	}
+
+	// Is There Any Deals
+	response, err := makeRequest(fmt.Sprintf("https://isthereanydeal.com/steam/app/%s", gameId))
+	if err = checkRequest(response, err); err == nil {
+		defer response.Body.Close()
+		body, _ := parseResponseToBody(response)
+		htmlString := string(body)
+
+		result.parseReviews(htmlString)
+		result.parseAvailability(htmlString)
+
+	} else {
+		fmt.Println("Failed to scrape IsThereAnyDeals page...")
 	}
 
 	return
@@ -189,7 +206,6 @@ func fetchGame(gameId string) (err error) {
 }
 
 func ParseGame(gameId string) (body []byte, err error) {
-
 	os.Mkdir("cache", 0777)
 	os.Mkdir("output", 0777)
 
@@ -226,32 +242,6 @@ func TakeInput() (string, error) {
 
 	return text, nil
 }
-
-// func isBlacklistedGenre(genre string) bool {
-// 	blacklisted := []string{"Early Access", "Indie", "Casual"}
-// 	for _, listedGenre := range blacklisted {
-// 		if genre == listedGenre {
-// 			return true
-// 		}
-// 	}
-
-// 	return false
-// }
-
-// func (game *Game) OutputGenres() string {
-// 	var output = ""
-
-// 	for _, v := range game.Data.Genres {
-// 		if isBlacklistedGenre(v.Description) {
-// 			continue
-// 		}
-
-// 		output += v.Description + ", "
-// 	}
-// 	output = strings.TrimSuffix(output, ", ")
-
-// 	return output
-// }
 
 func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Requirement) string {
 	value := "unknown"
@@ -300,11 +290,249 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 	return value
 }
 
-func RemoveTags(input string, replacement string) string {
+func RemoveTags(input, replacement string) string {
 	noTag, _ := regexp.Compile(`(<[^>]*>)+`)
 	output := noTag.ReplaceAllLiteralString(input, replacement)
 	output = strings.ReplaceAll(output, "\n ", "")
 	return output
+}
+
+func (game *Game) parseAvailability(htmlString string) {
+	doc, _ := html.Parse(strings.NewReader(htmlString))
+
+	var f func(n *html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "table" {
+			for _, a := range n.Attr {
+				if a.Key != "class" || a.Val != "t-st3 priceTable" {
+					continue
+				}
+
+				for c := n.FirstChild; c != nil; c = c.NextSibling {
+					if c.Type != html.ElementNode || c.Data != "tbody" {
+						continue
+					}
+					for d := c.FirstChild; d != nil; d = d.NextSibling {
+						if d.Type != html.ElementNode || d.Data != "tr" {
+							continue
+						}
+
+						for e := d.FirstChild; e != nil; e = e.NextSibling {
+							if e.Type != html.ElementNode || e.Data != "td" {
+								continue
+							}
+
+							for _, f := range e.Attr {
+								if f.Key != "class" || f.Val != "priceTable__shop" {
+									continue
+								}
+
+								for g := e.FirstChild; g != nil; g = g.NextSibling {
+									if g.Type != html.ElementNode || g.Data != "a" {
+										continue
+									}
+
+									var store, platform, url string
+									// cut, current, lowest, regular
+
+									for _, h := range g.Attr {
+										if h.Key == "href" {
+											url = h.Val
+										}
+									}
+									for i := g.FirstChild; i != nil; i = i.NextSibling {
+										if i.Type == html.TextNode {
+											store = i.Data
+										}
+									}
+
+									e = e.NextSibling
+									for _, h := range e.Attr {
+										if h.Key == "class" && h.Val == "priceTable__platforms" {
+											for i := e.FirstChild; i != nil; i = i.NextSibling {
+												if i.Type == html.TextNode {
+													platform = i.Data
+												}
+											}
+										}
+									}
+
+									// e = e.NextSibling
+									// for _, h := range e.Attr {
+									// 	if h.Key == "class" && h.Val == "priceTable__cut t-st3__num" {
+									// 		for i := e.FirstChild; i != nil; i = i.NextSibling {
+									// 			if i.Type == html.TextNode {
+									// 				cut = i.Data
+									// 			}
+									// 		}
+									// 	}
+									// }
+
+									// e = e.NextSibling
+									// for _, h := range e.Attr {
+									// 	if h.Key == "class" && h.Val == "priceTable__new t-st3__price s-low g-low" {
+									// 		for i := e.FirstChild; i != nil; i = i.NextSibling {
+									// 			if i.Type == html.TextNode {
+									// 				current = i.Data
+									// 			}
+									// 		}
+									// 	}
+									// }
+
+									// e = e.NextSibling
+									// for _, h := range e.Attr {
+									// 	if h.Key == "class" && h.Val == "priceTable__low t-st3__price s-low g-low" {
+									// 		for i := e.FirstChild; i != nil; i = i.NextSibling {
+									// 			if i.Type == html.TextNode {
+									// 				lowest = i.Data
+									// 			}
+									// 		}
+									// 	}
+									// }
+
+									// e = e.NextSibling
+									// for _, h := range e.Attr {
+									// 	if h.Key == "class" && h.Val == "priceTable__old t-st3__price" {
+									// 		for i := e.FirstChild; i != nil; i = i.NextSibling {
+									// 			if i.Type == html.TextNode {
+									// 				regular = i.Data
+									// 			}
+									// 		}
+									// 	}
+									// }
+
+									game.AddStore(store, platform, url)
+									// fmt.Printf("Store: %s, Platforms: %s, Price Cut: %s, Current: %s, Lowest: %s, Regular: %s\n", store, platform, cut, current, lowest, regular)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+}
+
+func (game *Game) parseReviews(htmlString string) {
+	reviewsRE := regexp.MustCompile(`<h2>Reviews<\/h2><a class='gReview.+<\/section>`)
+	reviews := reviewsRE.FindString(htmlString)
+	doc, _ := html.Parse(strings.NewReader(reviews))
+
+	var f func(n *html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			for _, a := range n.Attr {
+				if a.Key != "class" || !strings.Contains(a.Val, "gReview") {
+					continue
+				}
+
+				var href string
+				for _, b := range n.Attr {
+					if b.Key == "href" {
+						href = b.Val
+					}
+				}
+
+				for c := n.FirstChild; c != nil; c = c.NextSibling {
+					if c.Type != html.ElementNode || c.Data != "div" {
+						continue
+					}
+
+					for _, d := range c.Attr {
+						if d.Key != "class" || d.Val != "gReview__score" {
+							continue
+						}
+
+						for e := c.NextSibling; e != nil; e = e.NextSibling {
+							if e.Type != html.ElementNode || e.Data != "div" {
+								continue
+							}
+
+							for _, f := range e.Attr {
+								if f.Key != "class" && f.Val != "gReview__details" {
+									continue
+								}
+
+								for g := e.FirstChild; g != nil; g = g.NextSibling {
+									if g.Type != html.ElementNode || g.Data != "h3" {
+										continue
+									}
+
+									for h := g.FirstChild; h != nil; h = h.NextSibling {
+										if h.Type != html.TextNode {
+											continue
+										}
+
+										game.AddRating(h.Data, c.FirstChild.Data, href)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+
+	f(doc)
+}
+
+func (game *Game) AddStore(name, platforms, link string) {
+	validStores := [][]string{
+		{"Blizzard", "Battle.net", "https://us.shop.battle.net/en-us/product/"},
+		{"Discord", "Discord", "https://discordapp.com/store/skus/"},
+		{"Epic Game Store", "Epic Games Store", "https://www.epicgames.com/store/en-US/product/"},
+		{"GamersGate", "GamersGate", "https://www.gamersgate.com/product/"},
+		{"GamesPlanet UK", "GamesPlanet", "https://uk.gamesplanet.com/game/"},
+		{"GOG.com", "GOG.com", "https://www.gog.com/game/"},
+		{"GreenManGaming", "Green Man Gaming", "https://www.greenmangaming.com/games/"},
+		{"Humble Store", "Humble", "https://www.humblebundle.com/store/"},
+		{"Itch.io", "Itch.io", ""},
+		{"Origin", "Origin", "https://www.origin.com/store/"}}
+
+	key := -1
+	for k, v := range validStores {
+		if v[0] != name {
+			continue
+		}
+
+		key = k
+		name = validStores[key][1]
+		break
+	}
+
+	if key == -1 {
+		return
+	}
+
+	sanitised := platforms
+	sanitised = strings.Replace(sanitised, "Win", "Windows", 1)
+	sanitised = strings.Replace(sanitised, "Mac", "OS X", 1)
+
+	game.Data.Stores[name] = Store{
+		Platforms: sanitised,
+		URL:       strings.TrimPrefix(link, validStores[key][2]),
+	}
+}
+
+func (game *Game) AddRating(name, scoreString, link string) {
+	if _, ok := game.Data.Ratings[name]; ok {
+		return
+	}
+
+	score, _ := strconv.Atoi(scoreString)
+
+	game.Data.Ratings[name] = Rating{
+		Score: score,
+		URL:   link,
+	}
 }
 
 func (game *Game) FindDirectX() string {
@@ -476,6 +704,15 @@ func (game *Game) OutputSpecs() string {
 	return output
 }
 
+func addLanguage(languages Language, name string, ui, audio, subtitles bool) Language {
+	languages[name] = LanguageData{
+		UI:        ui,
+		Audio:     audio,
+		Subtitles: subtitles,
+	}
+	return languages
+}
+
 func ProcessLanguages(input string) Language {
 	languages := make(Language)
 	var language string
@@ -498,11 +735,7 @@ func ProcessLanguages(input string) Language {
 			// New line, new language!
 
 			if len(language) != 0 {
-				languages[language] = LanguageValue{
-					UI:        true,
-					Audio:     false,
-					Subtitles: true,
-				}
+				languages = addLanguage(languages, language, true, false, true)
 				// fmt.Printf("[ProcessLanguages] %s added (\\n found)\n", language)
 			}
 
@@ -512,11 +745,7 @@ func ProcessLanguages(input string) Language {
 
 		// Found * this means that it has complete support
 		if input[i] == '*' {
-			languages[language] = LanguageValue{
-				UI:        true,
-				Audio:     true,
-				Subtitles: true,
-			}
+			languages = addLanguage(languages, language, true, true, true)
 			// fmt.Printf("[ProcessLanguages] %s added (* found)\n", language)
 
 			language = ""
@@ -528,11 +757,7 @@ func ProcessLanguages(input string) Language {
 	}
 
 	if len(language) != 0 {
-		languages[language] = LanguageValue{
-			UI:        true,
-			Audio:     false,
-			Subtitles: true,
-		}
+		languages = addLanguage(languages, language, true, false, true)
 	}
 
 	return languages
