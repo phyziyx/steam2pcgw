@@ -202,10 +202,9 @@ func main() {
 			dlcs += fmt.Sprintf("%v, ", v)
 		}
 		dlcs = strings.TrimSuffix(dlcs, ", ")
-		dlcs += "\n"
 		outputFile.WriteString(dlcs)
 	}
-	outputFile.WriteString("|gogcom id    = \n|gogcom id side = \n|official site= ")
+	outputFile.WriteString("\n|gogcom id    = \n|gogcom id side = \n|official site= ")
 
 	if game.Data.Website != nil {
 		outputFile.WriteString(*game.Data.Website)
