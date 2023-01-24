@@ -588,13 +588,6 @@ func main() {
 	orderedLangauges := make([]string, 0, len(languages))
 	for key := range languages {
 		sanitisedKey := key
-
-		if sanitisedKey == "Simplified Chinese" {
-			sanitisedKey = "Chinese Simplified"
-		} else if sanitisedKey == "Traditional Chinese" {
-			sanitisedKey = "Chinese Traditional"
-		}
-
 		orderedLangauges = append(orderedLangauges, sanitisedKey)
 	}
 

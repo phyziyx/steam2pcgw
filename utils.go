@@ -706,6 +706,13 @@ func (game *Game) OutputSpecs() string {
 }
 
 func addLanguage(languages Language, name string, ui, audio, subtitles bool) Language {
+
+	if name == "Simplified Chinese" {
+		name = "Chinese Simplified"
+	} else if name == "Traditional Chinese" {
+		name = "Chinese Traditional"
+	}
+
 	languages[name] = LanguageData{
 		UI:        ui,
 		Audio:     audio,
@@ -726,12 +733,6 @@ func ProcessLanguages(input string) Language {
 	for i := 0; i < len(input); i++ {
 
 		// fmt.Printf("[ProcessLanguages] '%c' char found (language: '%s')\n", input[i], language)
-		if language == "Simplified Chinese" {
-			language = "Chinese Simplified"
-		} else if language == "Traditional Chinese" {
-			language = "Chinese Traditional"
-		}
-
 		if rune(input[i]) == '\n' {
 			// New line, new language!
 
