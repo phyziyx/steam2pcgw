@@ -850,10 +850,11 @@ func (game *Game) SetPacing(tags []string) {
 		}
 	}
 	if len(output) == 0 {
-		output += "Real-time, "
+		output += "Real-time"
+	} else {
+		output = strings.TrimSuffix(output, ", ")
+		output = strings.TrimSpace(output)
 	}
-	output = strings.TrimSuffix(output, ", ")
-	output = strings.TrimSpace(output)
 	game.Data.Pacing = output
 }
 
@@ -903,8 +904,13 @@ func (game *Game) SetControls(tags []string) {
 			}
 		}
 	}
-	output = strings.TrimSuffix(output, ", ")
-	output = strings.TrimSpace(output)
+
+	if len(output) == 0 {
+		output += "Direct control"
+	} else {
+		output = strings.TrimSuffix(output, ", ")
+		output = strings.TrimSpace(output)
+	}
 	game.Data.Controls = output
 }
 
@@ -1044,6 +1050,7 @@ func (game *Game) SetSports(tags []string) {
 			}
 		}
 	}
+
 	output = strings.TrimSuffix(output, ", ")
 	output = strings.TrimSpace(output)
 	game.Data.Sports = output
@@ -1079,6 +1086,7 @@ func (game *Game) SetVehicles(tags []string) {
 			}
 		}
 	}
+
 	output = strings.TrimSuffix(output, ", ")
 	output = strings.TrimSpace(output)
 	game.Data.Vehicles = output
@@ -1110,6 +1118,7 @@ func (game *Game) SetArtStyles(tags []string) {
 			}
 		}
 	}
+
 	if len(output) == 0 {
 		output = "Realistic"
 	} else {
