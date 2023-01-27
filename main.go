@@ -556,15 +556,18 @@ func main() {
 
 	fmt.Println("* [19/25] Processing Audio!")
 
+	game.ProcessLanguages()
+
 	outputFile.WriteString("\n\n")
 	outputFile.WriteString(`==Audio==
 {{Audio
 |separate volume           = unknown
 |separate volume notes     = 
 |surround sound            = unknown
-|surround sound notes      = 
-|subtitles                 = unknown
-|subtitles notes           = 
+|surround sound notes      = `)
+	outputFile.WriteString(fmt.Sprintf("|subtitles                 = %v\n", game.Data.Subtitles))
+
+	outputFile.WriteString(`|subtitles notes           = 
 |closed captions           = unknown
 |closed captions notes     = 
 |mute on focus lost        = unknown
@@ -580,12 +583,11 @@ func main() {
 }}`)
 
 	fmt.Println("* [20/25] Processing Languages!")
-	languages := ProcessLanguages(game.Data.SupportedLanguages)
 
 	outputFile.WriteString("\n\n{{L10n|content=")
 
-	orderedLangauges := make([]string, 0, len(languages))
-	for key := range languages {
+	orderedLangauges := make([]string, 0, len(game.Data.Languages))
+	for key := range game.Data.Languages {
 		sanitisedKey := key
 		orderedLangauges = append(orderedLangauges, sanitisedKey)
 	}
@@ -614,7 +616,7 @@ func main() {
 	}
 
 	for _, key := range orderedLangauges {
-		outputFile.WriteString(FormatLanguage(key, languages))
+		outputFile.WriteString(game.FormatLanguage(key))
 	}
 
 	outputFile.WriteString("\n}}\n")

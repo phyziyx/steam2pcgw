@@ -32,17 +32,19 @@ type Data struct {
 	ExternalAccountNotice string         `json:"ext_user_account_notice,omitempty"`
 	DRMNotice             string         `json:"drm_notice,omitempty"`
 
-	Stores       map[string]Store  `json:"-"` // Scrapped from IsThereAnyDeals
-	Ratings      map[string]Rating `json:"-"` // Scraped from IsThereAnyDeals
-	Genres       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Franchise    string            `json:"-"` // Scraped from Steam Store (Series on PCGW)
-	Pacing       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Perspectives string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Controls     string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Sports       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Vehicles     string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	ArtStyles    string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
-	Themes       string            `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Subtitles    bool                    `json:"-"` // Set manually by the language extraction code
+	Languages    map[string]LanguageData `json:"-"` // Extracted from the `SupportedLanguages` string
+	Stores       map[string]Store        `json:"-"` // Scrapped from IsThereAnyDeals
+	Ratings      map[string]Rating       `json:"-"` // Scraped from IsThereAnyDeals
+	Genres       string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Franchise    string                  `json:"-"` // Scraped from Steam Store (Series on PCGW)
+	Pacing       string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Perspectives string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Controls     string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Sports       string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Vehicles     string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	ArtStyles    string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
+	Themes       string                  `json:"-"` // Scraped from App Tags (Taxonomy on PCGW)
 }
 
 type PackageGroup struct {
@@ -111,4 +113,10 @@ type LanguageData struct {
 type Store struct {
 	Platforms string
 	URL       string
+}
+
+type ValidStore struct {
+	ScrapeName  string
+	DisplayName string
+	LinkToStrip string
 }

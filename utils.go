@@ -245,10 +245,7 @@ func TakeInput() (string, error) {
 func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Requirement) string {
 	value := "unknown"
 
-	if (platform == "windows" && !platforms.Windows) ||
-		(platform == "mac" && !platforms.MAC) ||
-		(platform == "linux" && !platforms.Linux) {
-	} else {
+	if (platform == "windows" && platforms.Windows) || (platform == "mac" && platforms.MAC) || (platform == "linux" && platforms.Linux) {
 		var sanitised = strings.ToLower(requirements["minimum"].(string))
 		sanitised = RemoveTags(sanitised, "\n")
 
@@ -311,6 +308,7 @@ func (game *Game) parseAvailability(htmlString string) {
 					if c.Type != html.ElementNode || c.Data != "tbody" {
 						continue
 					}
+
 					for d := c.FirstChild; d != nil; d = d.NextSibling {
 						if d.Type != html.ElementNode || d.Data != "tr" {
 							continue
@@ -339,6 +337,7 @@ func (game *Game) parseAvailability(htmlString string) {
 											url = h.Val
 										}
 									}
+
 									for i := g.FirstChild; i != nil; i = i.NextSibling {
 										if i.Type == html.TextNode {
 											store = i.Data
@@ -485,26 +484,67 @@ func (game *Game) parseReviews(htmlString string) {
 }
 
 func (game *Game) AddStore(name, platforms, link string) {
-	validStores := [][]string{
-		{"Blizzard", "Battle.net", "https://us.shop.battle.net/en-us/product/"},
-		{"Discord", "Discord", "https://discordapp.com/store/skus/"},
-		{"Epic Game Store", "Epic Games Store", "https://www.epicgames.com/store/en-US/product/"},
-		{"GamersGate", "GamersGate", "https://www.gamersgate.com/product/"},
-		{"GamesPlanet UK", "GamesPlanet", "https://uk.gamesplanet.com/game/"},
-		{"GOG.com", "GOG.com", "https://www.gog.com/game/"},
-		{"GreenManGaming", "Green Man Gaming", "https://www.greenmangaming.com/games/"},
-		{"Humble Store", "Humble", "https://www.humblebundle.com/store/"},
-		{"Itch.io", "Itch.io", ""},
-		{"Origin", "Origin", "https://www.origin.com/store/"}}
+	validStores := []ValidStore{
+		{
+			ScrapeName:  "Blizzard",
+			DisplayName: "Battle.net",
+			LinkToStrip: "https://us.shop.battle.net/en-us/product/",
+		},
+		{
+			ScrapeName:  "Discord",
+			DisplayName: "Discord",
+			LinkToStrip: "https://discordapp.com/store/skus/",
+		},
+		{
+			ScrapeName:  "Epic Game Store",
+			DisplayName: "Epic Games Store",
+			LinkToStrip: "https://www.epicgames.com/store/en-US/product/",
+		},
+		{
+			ScrapeName:  "GamersGate",
+			DisplayName: "GamersGate",
+			LinkToStrip: "https://www.gamersgate.com/product/",
+		},
+		{
+			ScrapeName:  "GamesPlanet UK",
+			DisplayName: "GamesPlanet",
+			LinkToStrip: "https://uk.gamesplanet.com/game/",
+		},
+		{
+			ScrapeName:  "GOG.com",
+			DisplayName: "GOG.com",
+			LinkToStrip: "https://www.gog.com/game/",
+		},
+		{
+			ScrapeName:  "GreenManGaming",
+			DisplayName: "Green Man Gaming",
+			LinkToStrip: "https://www.greenmangaming.com/games/",
+		},
+		{
+			ScrapeName:  "Humble Store",
+			DisplayName: "Humble",
+			LinkToStrip: "https://www.humblebundle.com/store/",
+		},
+		{
+			ScrapeName:  "Itch.io",
+			DisplayName: "Itch.io",
+			LinkToStrip: "",
+		},
+		{
+			ScrapeName:  "Origin",
+			DisplayName: "Origin",
+			LinkToStrip: "https://www.origin.com/store/",
+		},
+	}
 
 	key := -1
 	for k, v := range validStores {
-		if v[0] != name {
+		if v.ScrapeName != name {
 			continue
 		}
 
 		key = k
-		name = validStores[key][1]
+		name = validStores[key].DisplayName
 		break
 	}
 
@@ -518,7 +558,7 @@ func (game *Game) AddStore(name, platforms, link string) {
 
 	game.Data.Stores[name] = Store{
 		Platforms: sanitised,
-		URL:       strings.TrimPrefix(link, validStores[key][2]),
+		URL:       strings.TrimPrefix(link, validStores[key].LinkToStrip),
 	}
 }
 
@@ -605,8 +645,12 @@ func ProcessSpecs(input string, isMin bool) string {
 	if strings.Contains(output, "Graphics:") {
 		gpuRegEx := regexp.MustCompile(`Graphics:(.+)\n`)
 		gpus := gpuRegEx.FindStringSubmatch(output)
+
+		gpus[0] = strings.ReplaceAll(gpus[0], "or greater", "")
+		gpus[0] = strings.ReplaceAll(gpus[0], "or better", "")
+
 		if strings.Contains(gpus[0], "OpenGL") {
-			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL    = %s\n", level, strings.ReplaceAll(strings.ReplaceAll(gpus[1], " or greater", ""), "OpenGL ", "")))
+			output = gpuRegEx.ReplaceAllLiteralString(output, fmt.Sprintf("|%sOGL    = %s\n", level, strings.ReplaceAll(gpus[1], "OpenGL ", "")))
 		} else {
 			// Did not find OpenGL stuff, this means we can do a different regex then...
 			// Thanks Dandelion Sprout for this amazing RegEx
@@ -704,7 +748,7 @@ func (game *Game) OutputSpecs() string {
 	return output
 }
 
-func addLanguage(languages Language, name string, ui, audio, subtitles bool) Language {
+func (game *Game) addLanguage(name string, ui, audio, subtitles bool) {
 
 	if name == "Simplified Chinese" {
 		name = "Chinese Simplified"
@@ -712,31 +756,36 @@ func addLanguage(languages Language, name string, ui, audio, subtitles bool) Lan
 		name = "Chinese Traditional"
 	}
 
-	languages[name] = LanguageData{
+	game.Data.Languages[name] = LanguageData{
 		UI:        ui,
 		Audio:     audio,
 		Subtitles: subtitles,
 	}
-	return languages
+
+	// Any one language should at least have subtitles
+	if subtitles {
+		game.Data.Subtitles = true
+	}
 }
 
-func ProcessLanguages(input string) Language {
-	languages := make(Language)
+func (game *Game) ProcessLanguages() {
 	var language string
 
+	game.Data.Languages = make(Language)
+
+	input := game.Data.SupportedLanguages
 	input = strings.Replace(input, "<br><strong>*</strong>languages with full audio support", "", 1)
 	input = strings.ReplaceAll(input, ", ", "\n")
 	input = strings.ReplaceAll(input, "<strong>", "")
 	input = strings.ReplaceAll(input, "</strong>", "")
 
 	for i := 0; i < len(input); i++ {
-
 		// fmt.Printf("[ProcessLanguages] '%c' char found (language: '%s')\n", input[i], language)
 		if rune(input[i]) == '\n' {
 			// New line, new language!
 
 			if len(language) != 0 {
-				languages = addLanguage(languages, language, true, false, true)
+				game.addLanguage(language, true, false, true)
 				// fmt.Printf("[ProcessLanguages] %s added (\\n found)\n", language)
 			}
 
@@ -746,7 +795,7 @@ func ProcessLanguages(input string) Language {
 
 		// Found * this means that it has complete support
 		if input[i] == '*' {
-			languages = addLanguage(languages, language, true, true, true)
+			game.addLanguage(language, true, true, true)
 			// fmt.Printf("[ProcessLanguages] %s added (* found)\n", language)
 
 			language = ""
@@ -758,10 +807,8 @@ func ProcessLanguages(input string) Language {
 	}
 
 	if len(language) != 0 {
-		languages = addLanguage(languages, language, true, false, true)
+		game.addLanguage(language, true, false, true)
 	}
-
-	return languages
 }
 
 func IsDate(date string) (bool, []string) {
@@ -778,7 +825,7 @@ func ParseDate(date string) (output string) {
 	return output
 }
 
-func FormatLanguage(language string, languages Language) string {
+func (game *Game) FormatLanguage(language string) string {
 	sanitisedLanguage := language
 
 	if sanitisedLanguage == "Spanish - Spain" {
@@ -794,7 +841,7 @@ func FormatLanguage(language string, languages Language) string {
 	}
 
 	return fmt.Sprintf("\n{{L10n/switch\n|language  = %s\n|interface = %v\n|audio     = %v\n|subtitles = %v\n|notes     = \n|fan       = \n|ref       = \n}}",
-		sanitisedLanguage, languages[language].UI, languages[language].Audio, languages[language].Subtitles)
+		sanitisedLanguage, game.Data.Languages[language].UI, game.Data.Languages[language].Audio, game.Data.Languages[language].Subtitles)
 }
 
 func SanitiseName(name string, title bool) string {
