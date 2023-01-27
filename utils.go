@@ -92,15 +92,14 @@ func UnmarshalGame(data []byte) (result Game, err error) {
 	}
 
 	// Is There Any Deals
-	response, err := makeRequest(fmt.Sprintf("https://isthereanydeal.com/steam/app/%s", gameId))
-	if err = checkRequest(response, err); err == nil {
+	response, optionalErr := makeRequest(fmt.Sprintf("https://isthereanydeal.com/steam/app/%s", gameId))
+	if optionalErr = checkRequest(response, optionalErr); optionalErr == nil {
 		defer response.Body.Close()
 		body, _ := parseResponseToBody(response)
 		htmlString := string(body)
 
 		result.parseReviews(htmlString)
 		result.parseAvailability(htmlString)
-
 	} else {
 		fmt.Println("Failed to scrape IsThereAnyDeals page...")
 	}
@@ -849,6 +848,7 @@ func (game *Game) SetPacing(tags []string) {
 			}
 		}
 	}
+
 	if len(output) == 0 {
 		output += "Real-time"
 	} else {

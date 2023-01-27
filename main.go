@@ -56,7 +56,6 @@ func main() {
 		fmt.Println("Failed to create the output file... Process stopped!")
 		return
 	}
-	defer outputFile.Close()
 
 	fmt.Println("* [1/25] Adding stub")
 	outputFile.WriteString("{{stub}}\n")
@@ -748,6 +747,8 @@ func main() {
 
 	fmt.Println("* [25/25] Processing References!")
 	outputFile.WriteString("\n{{References}}")
+
+	outputFile.Close()
 
 	println(fmt.Sprintf("Successfully parsed information for game: '%s'", SanitiseName(game.Data.Name, true)))
 }
