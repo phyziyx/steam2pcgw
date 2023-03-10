@@ -17,7 +17,7 @@ func main() {
 
 	fmt.Println("Running", APP_NAME, VERSION, "(", GH_LINK, ")")
 
-	var gameId string
+	gameId := ""
 	var err error = nil
 
 	// Ask for input from the user
@@ -38,16 +38,12 @@ func main() {
 		return
 	}
 
-	var game Game
-	game, err = UnmarshalGame(gameJson)
-
+	game, err := UnmarshalGame(gameJson)
 	if err != nil {
 		fmt.Printf("An error occurred while attempting to unmarshal the JSON... (%s)\n", err)
 		return
-	}
-
-	if !game.Success {
-		fmt.Println("The app ID provided does not exist on the Steam database...")
+	} else if !game.Success {
+		fmt.Println("The app ID provided does not exist or does not have a Store page...")
 		return
 	}
 
@@ -90,7 +86,7 @@ func main() {
 	fmt.Println("* [5/25] Adding app release date")
 	outputFile.WriteString("\n|engines      =\n<!-- {{Infobox game/row/engine|}} -->\n|release dates= ")
 
-	var date string = ""
+	date := ""
 	if game.HasSteamGenre(EarlyAccess) {
 		date += "EA"
 	} else if game.Data.ReleaseDate.ComingSoon {
@@ -229,7 +225,6 @@ func main() {
 	outputFile.WriteString("\n\n==Availability==\n{{Availability|\n")
 
 	platforms := ""
-
 	if game.Data.Platforms.Windows {
 		platforms += "Windows, "
 	}
@@ -241,7 +236,6 @@ func main() {
 	}
 
 	platforms = strings.TrimSuffix(platforms, ", ")
-
 	var editions []string
 	trimPrice := regexp.MustCompile(`(\$.+ USD)`)
 
@@ -302,7 +296,7 @@ func main() {
 	}
 
 	// DRM check
-	var drms string
+	drms := ""
 	if strings.Contains(game.Data.DRMNotice, "Denuvo") {
 		drms += "{{DRM|Denuvo}}, "
 	}
