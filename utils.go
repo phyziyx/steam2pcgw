@@ -111,6 +111,7 @@ func makeRequest(url string) (*http.Response, error) {
 	client := &http.Client{}
 	getData := strings.NewReader("")
 	req, _ := http.NewRequest("GET", url, getData)
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
 	req.Header.Set("Cookie", "birthtime=0; max-age=315360000;")
 	resp, err := client.Do(req)
 

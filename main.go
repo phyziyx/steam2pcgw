@@ -564,9 +564,8 @@ func main() {
 |separate volume           = unknown
 |separate volume notes     = 
 |surround sound            = unknown
-|surround sound notes      = 
-`)
-	outputFile.WriteString(fmt.Sprintf("|subtitles                 = %v\n", game.Data.Subtitles))
+|surround sound notes      = `)
+	outputFile.WriteString(fmt.Sprintf("\n|subtitles                 = %v\n", game.Data.Subtitles))
 
 	outputFile.WriteString(`|subtitles notes           = 
 |closed captions           = unknown
