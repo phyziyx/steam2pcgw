@@ -259,6 +259,10 @@ func GetExeBit(is32 bool, platform string, platforms Platforms, requirements Req
 		} else if strings.Contains(sanitised, "32/64") {
 			value = "true"
 		} else {
+			if requirements["recommended"] != nil {
+				sanitised = strings.ToLower(requirements["recommended"].(string))
+				sanitised = RemoveTags(sanitised, "\n")
+			}
 			ramFinder := regexp.MustCompile(`memory:(\d+) gb`)
 			ramFound := ramFinder.FindStringSubmatch(sanitised)
 
