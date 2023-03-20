@@ -710,7 +710,11 @@ func main() {
 |linux 32-bit executable= %s
 |linux 64-bit executable= %s
 |linux arm app          = false
+|linux 68k app          = false
 |linux executable notes = 
+|mac os powerpc app     = false
+|mac os 68k app         = false 
+|mac os executable notes=
 }}`,
 		GetExeBit(true, "windows", game.Data.Platforms, game.Data.PCRequirements), GetExeBit(false, "windows", game.Data.Platforms, game.Data.PCRequirements),
 		GetExeBit(true, "mac", game.Data.Platforms, game.Data.MACRequirements), GetExeBit(false, "mac", game.Data.Platforms, game.Data.MACRequirements),
