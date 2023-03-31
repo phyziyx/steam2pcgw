@@ -298,6 +298,10 @@ func RemoveTags(input, replacement string) string {
 	return output
 }
 
+func formatCitation(note string) string {
+	return `{{cn|` + note + `}}`
+}
+
 func (game *Game) parseAvailability(htmlString string) {
 	doc, _ := html.Parse(strings.NewReader(htmlString))
 
@@ -585,14 +589,23 @@ func (game *Game) FindDirectX() string {
 		return ""
 	}
 
-	sanitised := RemoveTags(game.Data.PCRequirements["minimum"].(string), "\n")
+	retVal := RemoveTags(game.Data.PCRequirements["minimum"].(string), "\n")
 	dxRegex := regexp.MustCompile(`DirectX:(.+)\n`)
-	version := dxRegex.FindStringSubmatch(sanitised)
-	if len(version) == 2 {
-		return strings.Trim(version[1], "Version ")
+	version := dxRegex.FindString(retVal)
+	if len(version) != 0 {
+		version = strings.Trim(version, "DirectX")
+		version = strings.Trim(version, "Version")
+		version = strings.TrimSpace(version)
+
+		// Games with "DirectX 10" are using D3D11 API
+		if version == "10" {
+			version = "11"
+		}
+
+		version += formatCitation("This has been extracted from the game's store page using Steam2PCGW and needs to be confirmed.")
 	}
 
-	return ""
+	return version
 }
 
 func ProcessSpecs(input string, isMin bool) string {
